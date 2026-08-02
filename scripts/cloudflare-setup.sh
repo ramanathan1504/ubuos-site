@@ -44,13 +44,42 @@ if [ "$(echo "$TOKEN_CHECK" | ok)" != "yes" ]; then
   exit 1
 fi
 
-ACCOUNT_ID=$(cf GET /accounts | python3 -c 'import json,sys; a=json.load(sys.stdin)["result"]; print(a[0]["id"] if a else "")')
-[ -n "$ACCOUNT_ID" ] || { echo "✖ No account visible to this token. It needs Account → Cloudflare Pages → Edit."; exit 1; }
-echo "  account $ACCOUNT_ID"
+# The zone record carries its owning account, so one call gives us both ids.
+#
+# Reading them from /accounts instead looks natural and is wrong: listing
+# accounts is gated behind "Account Settings → Read", which a token scoped for
+# Pages and DNS has no reason to hold. The list comes back empty rather than
+# forbidden, so the failure reads as "no account" and sends you to re-check a
+# permission that was correct all along.
+ZONE_JSON=$(cf GET "/zones?name=ubuos.com")
+if [ "$(echo "$ZONE_JSON" | ok)" != "yes" ]; then
+  echo "✖ Could not read zones: $(echo "$ZONE_JSON" | err)"
+  echo "  The token needs Zone → Zone → Read covering ubuos.com."
+  exit 1
+fi
 
-ZONE_ID=$(cf "GET" "/zones?name=ubuos.com" | python3 -c 'import json,sys; z=json.load(sys.stdin)["result"]; print(z[0]["id"] if z else "")')
-[ -n "$ZONE_ID" ] || { echo "✖ Zone ubuos.com not visible. The token needs Zone → Zone → Read on ubuos.com."; exit 1; }
+read -r ZONE_ID ACCOUNT_ID <<< "$(echo "$ZONE_JSON" | python3 -c '
+import json, sys
+z = json.load(sys.stdin).get("result", [])
+print(z[0]["id"], z[0]["account"]["id"]) if z else print("", "")
+')"
+
+if [ -z "${ZONE_ID:-}" ]; then
+  echo "✖ Zone ubuos.com is not visible to this token."
+  echo "  Check Zone Resources includes the account holding ubuos.com."
+  exit 1
+fi
+echo "  account $ACCOUNT_ID"
 echo "  zone    $ZONE_ID"
+
+# Fails here rather than midway if the Pages permission is missing, so nothing
+# is half-created.
+PAGES_CHECK=$(cf GET "/accounts/$ACCOUNT_ID/pages/projects")
+if [ "$(echo "$PAGES_CHECK" | ok)" != "yes" ]; then
+  echo "✖ Cannot reach Pages: $(echo "$PAGES_CHECK" | err)"
+  echo "  The token needs Account → Cloudflare Pages → Edit."
+  exit 1
+fi
 
 # ── projects ─────────────────────────────────────────────────────────────────
 create_project() {
