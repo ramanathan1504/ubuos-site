@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UBUOS — tools that run on your own machine</title>
+<meta name="description" content="A small catalogue of developer tools built to work offline, on your own hardware, with your own data.">
+<meta property="og:title" content="UBUOS">
+<meta property="og:description" content="Tools that run on your own machine.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230B1B24'/><circle cx='16' cy='16' r='7' fill='none' stroke='%23C9A227' stroke-width='2.6'/><circle cx='16' cy='16' r='2.2' fill='%234E9A8F'/></svg>">
+
+<style>
+/* ============================================================
+   Same token family as the product pages, so a visitor moving
+   between ubuos.com and a subdomain stays in one world. The
+   catalogue leans quieter: the products are the loud part.
+   ============================================================ */
+:root{
+  --brass:#C9A227;
+  --patina:#3E8C82;
+
+  --bg:#EDF2F3;
+  --bg-raised:#F7FAFA;
+  --bg-sunken:#E3EBEC;
+  --ink:#0B1B24;
+  --ink-soft:#3E5560;
+  --ink-faint:#6E858F;
+  --rule:#CFDCDE;
+  --accent:#8A6A0F;
+  --accent-bright:#C9A227;
+  --link:#256A62;
+  --chip-live-bg:#DCEDE9;
+  --chip-live-ink:#1F5F55;
+  --chip-soon-bg:#E7EBEC;
+  --chip-soon-ink:#5B7079;
+
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,"JetBrains Mono","Cascadia Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+
+  --measure:64ch;
+  --gutter:clamp(1.25rem,4vw,2.5rem);
+  --shell:min(1080px,100% - var(--gutter) * 2);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#08161D; --bg-raised:#0E222C; --bg-sunken:#050F14;
+    --ink:#E4EDEE; --ink-soft:#A7BCC3; --ink-faint:#718A93; --rule:#1B3641;
+    --accent:#D8B23A; --accent-bright:#E8C558; --link:#5FB5AA;
+    --chip-live-bg:#123029; --chip-live-ink:#6FC7B8;
+    --chip-soon-bg:#152731; --chip-soon-ink:#8AA2AB;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#08161D; --bg-raised:#0E222C; --bg-sunken:#050F14;
+  --ink:#E4EDEE; --ink-soft:#A7BCC3; --ink-faint:#718A93; --rule:#1B3641;
+  --accent:#D8B23A; --accent-bright:#E8C558; --link:#5FB5AA;
+  --chip-live-bg:#123029; --chip-live-ink:#6FC7B8;
+  --chip-soon-bg:#152731; --chip-soon-ink:#8AA2AB;
+}
+:root[data-theme="light"]{
+  --bg:#EDF2F3; --bg-raised:#F7FAFA; --bg-sunken:#E3EBEC;
+  --ink:#0B1B24; --ink-soft:#3E5560; --ink-faint:#6E858F; --rule:#CFDCDE;
+  --accent:#8A6A0F; --accent-bright:#C9A227; --link:#256A62;
+  --chip-live-bg:#DCEDE9; --chip-live-ink:#1F5F55;
+  --chip-soon-bg:#E7EBEC; --chip-soon-ink:#5B7079;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:var(--sans);font-size:17px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;min-height:100vh;
+}
+h1,h2,h3{margin:0;text-wrap:balance;font-weight:600;letter-spacing:-.02em}
+p{margin:0}
+a{color:var(--link);text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent-bright);outline-offset:3px;border-radius:4px}
+code{font-family:var(--mono)}
+.shell{width:var(--shell);margin-inline:auto}
+
+/* ---------- masthead ---------- */
+.masthead{border-bottom:1px solid var(--rule)}
+.masthead-in{display:flex;align-items:center;gap:1rem;padding:.9rem 0}
+.wordmark{
+  display:flex;align-items:center;gap:.6rem;text-decoration:none;color:var(--ink);
+  font-family:var(--mono);font-weight:600;letter-spacing:.02em;font-size:1.02rem;
+}
+.wordmark .glyph{width:26px;height:26px;flex:none;display:grid;place-items:center;
+  border-radius:7px;background:#0B1B24}
+.masthead .right{margin-left:auto;display:flex;gap:1rem;align-items:center}
+.masthead a.gh{color:var(--ink-soft);text-decoration:none;font-size:.92rem}
+.masthead a.gh:hover{color:var(--ink)}
+.theme-btn{
+  background:transparent;border:1px solid var(--rule);color:var(--ink-soft);
+  border-radius:7px;padding:.35rem .55rem;cursor:pointer;font:inherit;font-size:.85rem;line-height:1;
+}
+.theme-btn:hover{border-color:var(--ink-faint);color:var(--ink)}
+
+/* ---------- intro ---------- */
+.intro{padding:clamp(3rem,8vw,5rem) 0 clamp(1.5rem,4vw,2.5rem)}
+.intro h1{
+  font-family:var(--mono);font-size:clamp(1.9rem,4.6vw,2.7rem);
+  line-height:1.12;letter-spacing:-.04em;
+}
+.intro h1 .em{color:var(--accent)}
+.intro p{margin-top:1.15rem;max-width:var(--measure);color:var(--ink-soft);font-size:1.05rem}
+
+/* ---------- catalogue ---------- */
+.catalogue{padding-bottom:clamp(3rem,7vw,4.5rem)}
+.section-label{
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-faint);padding-bottom:.85rem;border-bottom:1px solid var(--rule);
+}
+.grid{display:grid;gap:1rem;grid-template-columns:1fr;margin-top:1.5rem}
+@media (min-width:820px){.grid{grid-template-columns:repeat(2,1fr)}}
+
+.product{
+  display:grid;gap:.7rem;align-content:start;
+  background:var(--bg-raised);border:1px solid var(--rule);border-radius:12px;
+  padding:1.4rem 1.5rem;text-decoration:none;color:inherit;
+  transition:border-color .15s ease, transform .15s ease;
+}
+a.product:hover{border-color:var(--accent-bright);transform:translateY(-2px)}
+.product-top{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+.product h3{font-family:var(--mono);font-size:1.1rem;letter-spacing:-.02em}
+.product p{color:var(--ink-soft);font-size:.95rem}
+
+.chip{
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;
+  padding:.22rem .5rem;border-radius:999px;white-space:nowrap;
+}
+.chip-live{background:var(--chip-live-bg);color:var(--chip-live-ink)}
+.chip-soon{background:var(--chip-soon-bg);color:var(--chip-soon-ink)}
+
+.meta{
+  display:flex;gap:1rem;flex-wrap:wrap;
+  font-family:var(--mono);font-size:.76rem;color:var(--ink-faint);
+  padding-top:.3rem;
+}
+.meta .go{color:var(--accent);margin-left:auto}
+
+/* placeholder card for what has not shipped */
+.placeholder{
+  border:1px dashed var(--rule);background:transparent;
+  display:grid;gap:.5rem;align-content:center;justify-items:start;
+  padding:1.4rem 1.5rem;border-radius:12px;color:var(--ink-faint);
+}
+.placeholder h3{font-family:var(--mono);font-size:1rem;color:var(--ink-faint);letter-spacing:-.01em}
+.placeholder p{font-size:.9rem}
+
+/* ---------- footer ---------- */
+.foot{margin-top:auto;border-top:1px solid var(--rule);padding:1.75rem 0 2.5rem;
+  color:var(--ink-faint);font-size:.88rem}
+.foot-in{display:flex;flex-wrap:wrap;gap:.75rem 1.75rem;align-items:center}
+.foot a{color:var(--ink-soft)}
+.foot .spacer{margin-left:auto}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="shell masthead-in">
+    <a class="wordmark" href="/">
+      <span class="glyph" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="7" fill="none" stroke="#C9A227" stroke-width="2.8"/>
+          <circle cx="16" cy="16" r="2.2" fill="#4E9A8F"/>
+        </svg>
+      </span>
+      ubuos
+    </a>
+    <div class="right">
+      <a class="gh" href="https://github.com/ramanathan1504">GitHub</a>
+      <button class="theme-btn" id="theme-btn" type="button" aria-label="Switch colour theme">◐</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="intro">
+    <div class="shell">
+      <h1>Tools that run on<br><span class="em">your own machine.</span></h1>
+      <p>
+        Developer tools built to work offline, on your hardware, with your data staying
+        where it already is. Each one ships on its own, with its own docs.
+      </p>
+    </div>
+  </section>
+
+  <section class="catalogue">
+    <div class="shell">
+      <p class="section-label">Available now</p>
+
+      <div class="grid">
+        <a class="product" href="https://osscli.ubuos.com">
+          <div class="product-top">
+            <h3>OSS-CLI</h3>
+            <span class="chip chip-live">Live · v1.4.0</span>
+          </div>
+          <p>
+            A local-first investigation workbench for open-source maintainers. Indexes the
+            repositories you follow and the notes you keep, then reviews pull requests against
+            what it finds. Works with just a GitHub token.
+          </p>
+          <div class="meta">
+            <span>Java 17</span>
+            <span>Apache-2.0</span>
+            <span class="go">Docs &rarr;</span>
+          </div>
+        </a>
+
+        <div class="placeholder">
+          <h3>More coming</h3>
+          <p>Each tool is released on its own, once it works properly on its own.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="shell foot-in">
+    <span>UBUOS</span>
+    <a href="https://github.com/ramanathan1504">GitHub</a>
+    <a href="https://osscli.ubuos.com">OSS-CLI</a>
+    <span class="spacer"></span>
+    <span>Runs on your machine.</span>
+  </div>
+</footer>
+
+<script>
+// Theme toggle stamps data-theme so it overrides the OS preference in both directions.
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('theme-btn');
+  try {
+    var saved = localStorage.getItem('ubuos-theme');
+    if (saved) root.setAttribute('data-theme', saved);
+  } catch (e) {}
+
+  btn.addEventListener('click', function () {
+    var current = root.getAttribute('data-theme');
+    if (!current) {
+      current = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('ubuos-theme', next); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>

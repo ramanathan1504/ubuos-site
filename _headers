@@ -1,0 +1,14 @@
+# Cloudflare Pages reads this file. One rule set, applied to every path.
+#
+# The page loads nothing from another host, so the policy can be closed to
+# 'self'. Stating it here means a later edit reaching for a CDN fails visibly in
+# production rather than quietly widening what the page may fetch.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), interest-cohort=()
+  X-Frame-Options: DENY
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
