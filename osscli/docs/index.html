@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OSS-CLI docs</title>
+<meta name="description" content="Install and command reference for OSS-CLI.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230B1B24'/><path d='M8 12h5M8 17h9M8 22h6' stroke='%23C9A227' stroke-width='2.4' stroke-linecap='round'/><circle cx='23' cy='12' r='2.4' fill='%234E9A8F'/></svg>">
+
+<style>
+:root{
+  --bg:#EDF2F3; --bg-raised:#F7FAFA; --bg-sunken:#E3EBEC;
+  --ink:#0B1B24; --ink-soft:#3E5560; --ink-faint:#6E858F; --rule:#CFDCDE;
+  --accent:#8A6A0F; --accent-bright:#C9A227; --link:#256A62;
+  --term-bg:#0B1B24; --term-ink:#D6E4E6; --term-dim:#7A939C;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,"JetBrains Mono","Cascadia Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --gutter:clamp(1.25rem,4vw,2.5rem);
+  --shell:min(1080px,100% - var(--gutter) * 2);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#08161D; --bg-raised:#0E222C; --bg-sunken:#050F14;
+    --ink:#E4EDEE; --ink-soft:#A7BCC3; --ink-faint:#718A93; --rule:#1B3641;
+    --accent:#D8B23A; --accent-bright:#E8C558; --link:#5FB5AA;
+    --term-bg:#050F14; --term-dim:#6E888F;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#08161D; --bg-raised:#0E222C; --bg-sunken:#050F14;
+  --ink:#E4EDEE; --ink-soft:#A7BCC3; --ink-faint:#718A93; --rule:#1B3641;
+  --accent:#D8B23A; --accent-bright:#E8C558; --link:#5FB5AA;
+  --term-bg:#050F14; --term-dim:#6E888F;
+}
+:root[data-theme="light"]{
+  --bg:#EDF2F3; --bg-raised:#F7FAFA; --bg-sunken:#E3EBEC;
+  --ink:#0B1B24; --ink-soft:#3E5560; --ink-faint:#6E858F; --rule:#CFDCDE;
+  --accent:#8A6A0F; --accent-bright:#C9A227; --link:#256A62;
+  --term-bg:#0B1B24; --term-dim:#7A939C;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;text-wrap:balance;font-weight:600;letter-spacing:-.02em}
+p{margin:0}
+a{color:var(--link);text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent-bright);outline-offset:3px;border-radius:4px}
+code{font-family:var(--mono);font-size:.92em}
+.shell{width:var(--shell);margin-inline:auto}
+
+.masthead{border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:20;
+  background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(8px)}
+.masthead-in{display:flex;align-items:center;gap:1.2rem;padding:.85rem 0}
+.wordmark{display:flex;align-items:center;gap:.55rem;text-decoration:none;color:var(--ink);
+  font-family:var(--mono);font-weight:600;font-size:1rem;letter-spacing:-.02em}
+.wordmark .glyph{width:24px;height:24px;flex:none;display:grid;place-items:center;
+  border-radius:6px;background:#0B1B24}
+.masthead nav{margin-left:auto;display:flex;gap:1.2rem;align-items:center}
+.masthead nav a{color:var(--ink-soft);text-decoration:none;font-size:.92rem}
+.masthead nav a:hover{color:var(--ink)}
+.theme-btn{background:transparent;border:1px solid var(--rule);color:var(--ink-soft);
+  border-radius:7px;padding:.32rem .52rem;cursor:pointer;font:inherit;font-size:.85rem;line-height:1}
+
+/* two-column: sticky contents beside the prose */
+.layout{display:grid;gap:2.5rem;grid-template-columns:1fr;padding:2.5rem 0 4rem}
+@media (min-width:940px){.layout{grid-template-columns:14rem minmax(0,1fr)}}
+
+.toc{align-self:start}
+@media (min-width:940px){.toc{position:sticky;top:4.5rem}}
+.toc p{font-family:var(--mono);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:.8rem}
+.toc a{display:block;padding:.3rem 0;color:var(--ink-soft);text-decoration:none;font-size:.93rem}
+.toc a:hover{color:var(--accent)}
+
+.doc h1{font-family:var(--mono);font-size:clamp(1.7rem,4vw,2.2rem);letter-spacing:-.04em}
+.doc > p.lede{margin-top:.9rem;color:var(--ink-soft);max-width:66ch}
+.doc section{padding-top:2.5rem}
+.doc h2{font-size:1.3rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+.doc h3{font-family:var(--mono);font-size:1rem;margin-top:1.75rem;color:var(--accent)}
+.doc p{margin-top:.85rem;max-width:66ch;color:var(--ink-soft)}
+.doc p strong{color:var(--ink)}
+
+pre{margin:.9rem 0 0;background:var(--term-bg);color:var(--term-ink);border-radius:10px;
+  padding:.9rem 1.05rem;overflow-x:auto;font-family:var(--mono);font-size:.83rem;line-height:1.6;
+  border:1px solid #1D3B47}
+pre .c{color:var(--term-dim)}
+
+.table-wrap{margin-top:1rem;overflow-x:auto;border:1px solid var(--rule);
+  border-radius:10px;background:var(--bg-raised)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.93rem}
+th,td{text-align:left;padding:.68rem .9rem;border-bottom:1px solid var(--rule);vertical-align:top}
+thead th{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-faint);font-weight:500;background:var(--bg-sunken)}
+tbody tr:last-child td{border-bottom:0}
+td code{color:var(--accent);white-space:nowrap}
+td.need{font-family:var(--mono);font-size:.8rem;color:var(--ink-faint)}
+
+.note{margin-top:1rem;border-left:2px solid var(--accent-bright);padding-left:.9rem;
+  color:var(--ink-soft);font-size:.94rem;max-width:64ch}
+
+.foot{border-top:1px solid var(--rule);padding:1.75rem 0 2.5rem;color:var(--ink-faint);font-size:.88rem}
+.foot-in{display:flex;flex-wrap:wrap;gap:.7rem 1.6rem;align-items:center}
+.foot a{color:var(--ink-soft)}
+.foot .spacer{margin-left:auto}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms !important}}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="shell masthead-in">
+    <a class="wordmark" href="/">
+      <span class="glyph" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 32 32" fill="none">
+          <path d="M8 12h5M8 17h9M8 22h6" stroke="#C9A227" stroke-width="2.8" stroke-linecap="round"/>
+          <circle cx="23" cy="12" r="2.4" fill="#4E9A8F"/>
+        </svg>
+      </span>
+      ubuos
+    </a>
+    <nav>
+      <a href="/osscli">OSS-CLI</a>
+      <a href="https://github.com/ramanathan1504/oss-cli">GitHub</a>
+      <button class="theme-btn" id="theme-btn" type="button" aria-label="Switch colour theme">◐</button>
+    </nav>
+  </div>
+</header>
+
+<div class="shell layout">
+
+  <aside class="toc">
+    <p>Contents</p>
+    <a href="#install">Install</a>
+    <a href="#first-run">First run</a>
+    <a href="#commands">Commands</a>
+    <a href="#review">Reviewing a PR</a>
+    <a href="#onboard">Joining a project</a>
+    <a href="#config">Configuration</a>
+    <a href="#trouble">Troubleshooting</a>
+  </aside>
+
+  <main class="doc">
+    <h1>OSS-CLI docs</h1>
+    <p class="lede">
+      Everything the tool does, and what each part needs. A GitHub token is the only
+      hard requirement — every other capability is a layer you add when you want it.
+    </p>
+
+    <section id="install">
+      <h2>Install</h2>
+
+      <h3>macOS</h3>
+<pre>brew install ramanathan1504/oss-cli/oss-cli</pre>
+      <p>Homebrew pulls in OpenJDK 17 and puts <code>oss-cli</code> on your PATH.</p>
+
+      <h3>Linux</h3>
+<pre><span class="c"># Java 17</span>
+sudo apt install openjdk-17-jre        <span class="c"># Debian / Ubuntu</span>
+sudo dnf install java-17-openjdk       <span class="c"># Fedora / RHEL</span>
+
+mkdir -p ~/.local/share ~/.local/bin
+
+<span class="c"># resolves the newest release, so this stays correct</span>
+JAR_URL=$(curl -fsSL https://api.github.com/repos/ramanathan1504/oss-cli/releases/latest \
+  | grep -o '"browser_download_url": *"[^"]*\.jar"' | cut -d'"' -f4)
+curl -fL -o ~/.local/share/oss-cli.jar "$JAR_URL"
+
+printf '#!/bin/sh\nexec java -jar %s "$@"\n' ~/.local/share/oss-cli.jar > ~/.local/bin/oss-cli
+chmod +x ~/.local/bin/oss-cli</pre>
+
+      <h3>Windows</h3>
+<pre>winget install EclipseAdoptium.Temurin.17.JRE
+
+<span class="c"># PowerShell</span>
+$dir = "$env:LOCALAPPDATA\oss-cli"
+New-Item -ItemType Directory -Force -Path $dir | Out-Null
+
+$rel = Invoke-RestMethod https://api.github.com/repos/ramanathan1504/oss-cli/releases/latest
+$url = ($rel.assets | Where-Object { $_.name -like "*.jar" })[0].browser_download_url
+Invoke-WebRequest -Uri $url -OutFile "$dir\oss-cli.jar"
+
+"@echo off`r`njava -jar `"$dir\oss-cli.jar`" %*" | Out-File -Encoding ascii "$dir\oss-cli.cmd"
+$env:Path += ";$dir"</pre>
+
+      <h3>A GitHub token</h3>
+<pre><span class="c"># macOS — the gh CLI already has one</span>
+security add-generic-password -a "$USER" -s github_token -w "$(gh auth token)" -U
+
+<span class="c"># Linux / Windows</span>
+export GITHUB_TOKEN="ghp_your_token_here"</pre>
+      <p>Then check everything at once:</p>
+<pre>oss-cli doctor</pre>
+    </section>
+
+    <section id="first-run">
+      <h2>First run</h2>
+<pre><span class="c"># register any repository you want to follow</span>
+oss-cli sync --add apache/kafka
+
+<span class="c"># pull issues and PRs, then build the search index</span>
+oss-cli sync --all
+
+<span class="c"># review a pull request</span>
+oss-cli review 4234 -r apache/kafka</pre>
+      <p class="note">
+        <strong>Optional, any time:</strong> install <a href="https://ollama.com">Ollama</a> for
+        local answers and semantic search, then run <code>oss-cli setup</code> to point it at your
+        own note folders. Skip both and every command above still works.
+      </p>
+    </section>
+
+    <section id="commands">
+      <h2>Commands</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Command</th><th>Needs</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><code>sync --add &lt;repo&gt;</code></td><td class="need">token</td><td>Registers a repository and builds its convention profile</td></tr>
+            <tr><td><code>sync --all</code></td><td class="need">token</td><td>Pulls issues and PRs, then updates the search index</td></tr>
+            <tr><td><code>sync --me</code></td><td class="need">token</td><td>Indexes your own PR history and your note folders</td></tr>
+            <tr><td><code>profile</code></td><td class="need">token</td><td>Language, build, toolchain and enforced conventions</td></tr>
+            <tr><td><code>onboard</code></td><td class="need">token</td><td>What a project expects before you contribute</td></tr>
+            <tr><td><code>review &lt;pr&gt;</code></td><td class="need">token</td><td>Reviews a PR using every source you have connected</td></tr>
+            <tr><td><code>prompt &lt;issue&gt;</code></td><td class="need">token</td><td>Answers locally, or builds an expert prompt when it cannot</td></tr>
+            <tr><td><code>search &lt;query&gt;</code></td><td class="need">Ollama</td><td>Semantic search across everything indexed</td></tr>
+            <tr><td><code>triage &lt;issue&gt;</code></td><td class="need">Ollama</td><td>Full triage audit for one issue</td></tr>
+            <tr><td><code>doctor</code></td><td class="need">—</td><td>Checks every prerequisite and says what to fix</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Every command accepts <code>--help</code>.</p>
+    </section>
+
+    <section id="review">
+      <h2>Reviewing a pull request</h2>
+<pre>oss-cli review 4234</pre>
+      <p>
+        Built as a ladder. Each layer is optional and additive, and the output states which
+        were <strong>actually used</strong> — so a thin review is never mistaken for a clean one.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Layer</th><th>Requires</th><th>Adds</th></tr></thead>
+          <tbody>
+            <tr><td>Facts</td><td class="need">token</td><td>Diff, commits, files by area, CI checks, review threads</td></tr>
+            <tr><td>Conventions</td><td class="need">a profile</td><td>Deterministic gate checks, no model involved</td></tr>
+            <tr><td>History</td><td class="need">your notes</td><td>Your prior work on the changed paths</td></tr>
+            <tr><td>Verdict</td><td class="need">Ollama</td><td>Local judgment against the project's rules</td></tr>
+            <tr><td>Escalation</td><td class="need">cloud key</td><td>The whole diff read by a cloud model when it is too large</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Evidence is cached by <strong>head commit</strong>, not PR number — a push rewrites the
+        pull request, so re-reviewing unchanged code is instant while a new push re-fetches on
+        its own. No local clone is needed.
+      </p>
+<pre>oss-cli review 4234 --no-verdict     <span class="c"># facts and conventions only</span>
+oss-cli review 4234 --escalate       <span class="c"># send large diffs to a cloud model</span>
+oss-cli review 4234 --refresh        <span class="c"># ignore the cache</span></pre>
+    </section>
+
+    <section id="onboard">
+      <h2>Joining a project</h2>
+<pre>oss-cli onboard -r apache/logging-log4j2</pre>
+      <p>
+        The same profile <code>review</code> judges against, read from the other direction:
+        what to target <em>before</em> writing anything. Reports rules as instructions rather
+        than plugin names, extracts build commands from the project's own documentation, and
+        lists open issues labelled for newcomers, fewest comments first.
+      </p>
+    </section>
+
+    <section id="config">
+      <h2>Configuration</h2>
+      <p>Settings live in SQLite, not a dotfile. <code>oss-cli setup</code> writes them.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Key</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>default.repository</code></td><td>Used when <code>-r</code> is omitted</td></tr>
+            <tr><td><code>drive.paths</code></td><td>Folders holding your notes, comma separated</td></tr>
+            <tr><td><code>ollama.model.embedding</code></td><td>Model for the vector index</td></tr>
+            <tr><td><code>ollama.model.guidance</code></td><td>Model for answers and verdicts</td></tr>
+            <tr><td><code>ollama.context_limit</code></td><td>Tokens before escalation</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Your data lives in <code>~/.oss-cli</code>. Nothing leaves the machine unless you escalate a prompt to a cloud model.</p>
+    </section>
+
+    <section id="trouble">
+      <h2>Troubleshooting</h2>
+      <p>Start here — it checks every prerequisite and names what to fix:</p>
+<pre>oss-cli doctor</pre>
+
+      <h3>GitHub rejected the token</h3>
+      <p>The stored token expired or was revoked. Create a new one and register it:</p>
+<pre>security add-generic-password -a "$USER" -s github_token -w "$(gh auth token)" -U</pre>
+
+      <h3>Cannot reach the Ollama daemon</h3>
+      <p>Ollama is not running. Start it — installing a model cannot fix a stopped server:</p>
+<pre>ollama serve</pre>
+
+      <h3>Issues sync but search finds nothing</h3>
+      <p>
+        The vector index is built during <code>sync</code> and needs Ollama. If it was not
+        running, the issues were saved without vectors. Start Ollama and sync again — indexing
+        is incremental, so only the missing ones are built.
+      </p>
+    </section>
+  </main>
+</div>
+
+<footer class="foot">
+  <div class="shell foot-in">
+    <span>OSS-CLI — Apache-2.0</span>
+    <a href="/osscli">Overview</a>
+    <a href="https://github.com/ramanathan1504/oss-cli">Source</a>
+    <a href="https://github.com/ramanathan1504/oss-cli/issues">Report an issue</a>
+    <span class="spacer"></span>
+    <span>Runs on your machine.</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('theme-btn');
+  try { var s = localStorage.getItem('ubuos-theme'); if (s) root.setAttribute('data-theme', s); } catch (e) {}
+  btn.addEventListener('click', function () {
+    var cur = root.getAttribute('data-theme') ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = cur === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('ubuos-theme', next); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>
