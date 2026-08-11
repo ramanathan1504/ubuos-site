@@ -79,19 +79,26 @@ jobs:
 
       - name: Create the Pages project if it does not exist
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' }}
-        # `pages deploy` fails outright on a project that does not exist yet, so
-        # the first deploy of a NEW site would always fail once and need somebody
-        # to go and click Create in a dashboard. The credential is already here;
-        # creating it is one call, and it is idempotent -- an existing project
-        # makes this a no-op rather than an error.
+        # `pages deploy` fails outright on a project that does not exist, so the
+        # first deploy of a NEW site would always fail once and need somebody to
+        # click Create in a dashboard -- the kind of step that gets forgotten and
+        # then debugged as a broken pipeline.
+        #
+        # Attempt-and-tolerate rather than list-then-create: parsing `project
+        # list` output meant depending on its formatting, and when the match
+        # silently failed this tried to create a project that already existed and
+        # turned a working deploy red. Only "already exists" is swallowed; every
+        # other failure is printed and fatal.
         run: |
-          if npx --yes wrangler@latest pages project list 2>/dev/null \
-               | grep -qE "^\s*${{ matrix.project }}\s"; then
-            echo "project ${{ matrix.project }} already exists"
+          set -o pipefail
+          if out=$(npx --yes wrangler@latest pages project create ${{ matrix.project }} \
+                     --production-branch=main 2>&1); then
+            echo "created ${{ matrix.project }}"
+          elif echo "$out" | grep -q "already exists"; then
+            echo "${{ matrix.project }} already exists"
           else
-            echo "creating project ${{ matrix.project }}"
-            npx --yes wrangler@latest pages project create ${{ matrix.project }} \
-              --production-branch=main
+            echo "$out"
+            exit 1
           fi
 
       - name: Publish
