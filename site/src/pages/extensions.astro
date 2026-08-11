@@ -1,0 +1,84 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+
+const extensions = (await getCollection('extensions')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<Base
+  title="Extensions — ubuos"
+  description="An extension is a directory with one JSON file. Write it in anything; it runs as a process, not as a plugin."
+>
+  <section>
+    <p class="pill">Extensions</p>
+    <h1>Anything can be an extension.</h1>
+    <p class="lede">
+      There is no SDK to depend on and no interface to implement. An extension is a
+      directory containing one file, and it is run as a child process — so it can be
+      bash, Python, Go, or a binary somebody handed you.
+    </p>
+  </section>
+
+  <section class="tight">
+    <h2>Available now</h2>
+    <div class="grid">
+      {extensions.map((e) => (
+        <article class="card">
+          <h3>{e.data.name} <span class="pill">{e.data.kind}</span></h3>
+          <p>{e.data.summary}</p>
+          <pre class="mini"><code>{e.data.attach}</code></pre>
+          {e.data.repo && <p class="more"><a href={e.data.repo}>Source →</a></p>}
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="tight">
+    <h2>Writing one</h2>
+    <p class="lede">Put this at the root of your repository, and paste the path.</p>
+
+    <pre><code>{`{
+  "name": "kafka",
+  "kind": "runner",
+  "description": "My own Kafka setup — brokers on localhost:9092",
+  "exec": "./kbench",
+  "verbs": { "list": "list", "run": "run" }
+}`}</code></pre>
+
+    <div class="notes">
+      <div>
+        <h3>Two kinds</h3>
+        <p>
+          A <strong>runner</strong> executes something real. A <strong>memory</strong>
+          remembers. They are the two questions the core cannot answer alone.
+        </p>
+      </div>
+      <div>
+        <h3>Verbs are a mapping</h3>
+        <p>
+          The left side is what the core says; the right side is what your tool calls it.
+          You never have to rename your own commands to join in.
+        </p>
+      </div>
+      <div>
+        <h3>Writing outward is refused</h3>
+        <p>
+          If a verb of yours posts somewhere public, declare it. It is then refused unless
+          the person names the repository on the command line and confirms it — every time.
+        </p>
+      </div>
+    </div>
+
+    <pre class="mini"><code>oss ext add /path/to/your/repo
+oss ext list</code></pre>
+  </section>
+
+  <style>
+    .tight { padding-top: 0; }
+    .mini { margin-top: 16px; font-size: 13.5px; }
+    .more { margin-top: 14px; }
+    .more a { color: var(--accent); text-decoration: none; }
+    .notes { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin: 30px 0; }
+    .notes p { color: var(--muted); margin: 0; }
+  </style>
+</Base>

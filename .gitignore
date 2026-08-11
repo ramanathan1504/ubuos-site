@@ -1,1 +1,9 @@
 .DS_Store
+
+# Astro
+site/node_modules/
+site/dist/
+site/.astro/
+docs/node_modules/
+docs/dist/
+docs/.astro/

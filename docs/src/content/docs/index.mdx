@@ -1,0 +1,32 @@
+---
+title: ubuos
+description: Maintainer tooling — read any repository, run what needs running, remember what you worked out.
+template: splash
+hero:
+  tagline: The context you already have, assembled before you need it.
+  actions:
+    - text: Install
+      link: /install/
+      icon: right-arrow
+    - text: Source
+      link: https://github.com/ramanathan1504/oss-cli
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid stagger>
+  <Card title="Works with nothing else" icon="approve-check">
+    Java 17 and a GitHub token. Storing, filing and finding by keyword need no AI at all.
+  </Card>
+  <Card title="Attach a runner" icon="rocket">
+    Answers *does this actually run?* — the one question reading the code cannot settle.
+  </Card>
+  <Card title="Attach a memory" icon="open-book">
+    Plain Markdown on your disk, filed by topic, readable in ten years.
+  </Card>
+  <Card title="Nothing leaves without asking" icon="warning">
+    Writing to a public repository is refused unless you name it and confirm — every time.
+  </Card>
+</CardGrid>

@@ -1,0 +1,119 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+
+// Sorted explicitly. "Whatever order the filesystem returned" is not an
+// editorial decision, and it changes silently when a file is renamed.
+const tools = (await getCollection('tools')).sort((a, b) => a.data.order - b.data.order);
+const extensions = (await getCollection('extensions')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<Base
+  title="ubuos — tools for people who maintain things"
+  description="Open-source maintainer tooling. Reads any repository, runs what needs running, remembers what you worked out."
+>
+  <section class="hero">
+    <p class="pill">Maintainer tooling</p>
+    <h1>The context you already have,<br />assembled before you need it.</h1>
+    <p class="lede">
+      Reading a pull request is not the hard part. Remembering what you decided last time,
+      whether it reproduces, and what the project expects — that is the hard part, and it is
+      the part nothing keeps for you.
+    </p>
+
+    <div class="cta">
+      <pre><code>brew install ramanathan1504/oss-cli/oss</code></pre>
+      <p class="dim small">
+        Java 17 and a GitHub token is the whole requirement. Everything else is optional.
+      </p>
+    </div>
+  </section>
+
+  <section id="tools">
+    <h2>The tools</h2>
+    <p class="lede">One core. Everything else attaches to it.</p>
+    <div class="grid">
+      {tools.map((t) => (
+        <article class="card">
+          <h3>
+            {t.data.name}
+            {t.data.status !== 'stable' && <span class="pill status">{t.data.status}</span>}
+          </h3>
+          <p class="tagline">{t.data.tagline}</p>
+          <p>{t.data.summary}</p>
+          {t.data.install && <pre class="mini"><code>{t.data.install}</code></pre>}
+          {t.data.repo && (
+            <p class="more"><a href={t.data.repo}>Source →</a></p>
+          )}
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section id="how">
+    <h2>Nothing is mandatory</h2>
+    <p class="lede">
+      It works with none of it. Each layer only makes the next question cheaper.
+    </p>
+    <div class="grid">
+      <article class="card">
+        <h3>On its own</h3>
+        <p>
+          Facts about any repository, straight from the API. No clone, any language.
+          Storing and filing work with no AI at all.
+        </p>
+      </article>
+      <article class="card">
+        <h3>Plus a runner</h3>
+        <p>
+          Answers <em>does this actually run?</em> — the one question a reader of code
+          cannot answer by reading it.
+        </p>
+      </article>
+      <article class="card">
+        <h3>Plus a memory</h3>
+        <p>
+          Answers <em>have I worked this out before?</em> Plain Markdown on your disk,
+          filed by topic, readable in ten years.
+        </p>
+      </article>
+      <article class="card">
+        <h3>Plus a local model</h3>
+        <p>
+          Optional. Adds verdicts and search by meaning. Nothing is sent anywhere unless
+          you ask for it.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section id="extensions">
+    <h2>Extensions</h2>
+    <p class="lede">
+      An extension is a directory with one JSON file in it. Write it in anything — it is
+      run as a process, not loaded as a plugin.
+    </p>
+    <div class="grid">
+      {extensions.map((e) => (
+        <article class="card">
+          <h3>{e.data.name} <span class="pill">{e.data.kind}</span></h3>
+          <p>{e.data.summary}</p>
+          <pre class="mini"><code>{e.data.attach}</code></pre>
+        </article>
+      ))}
+    </div>
+    <p class="more"><a href="/extensions">How to write one →</a></p>
+  </section>
+
+  <style>
+    .hero { padding-top: clamp(64px, 11vw, 132px); }
+    .cta { margin-top: 34px; max-width: 620px; }
+    .small { font-size: 14px; margin-top: 10px; }
+    .tagline { color: var(--fg) !important; font-weight: 520; margin-bottom: 8px !important; }
+    .mini { margin-top: 14px; font-size: 13px; }
+    .more { margin-top: 16px; }
+    .more a { color: var(--accent); text-decoration: none; font-weight: 520; }
+    .more a:hover { text-decoration: underline; }
+    .status { margin-left: 8px; }
+  </style>
+</Base>
