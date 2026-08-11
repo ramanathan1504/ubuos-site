@@ -19,6 +19,9 @@ on:
       docs:
         description: 'Docs subdomain'
         default: 'docs.ubuos.com'
+      www:
+        description: 'www host for the apex (blank to skip)'
+        default: 'www.ubuos.com'
 
 permissions:
   contents: read
@@ -32,6 +35,7 @@ jobs:
       ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       APEX: ${{ inputs.apex }}
       DOCS: ${{ inputs.docs }}
+      WWW: ${{ inputs.www }}
     steps:
       - name: Check the credentials are present and valid
         run: |
@@ -97,6 +101,10 @@ jobs:
           }
           upsert "$APEX" "ubuos-site.pages.dev"
           upsert "$DOCS" "ubuos-docs.pages.dev"
+          # www served 530 -- a hostname Cloudflare proxies but Pages has never
+          # been told about. Handled here so it cannot be the one host that is
+          # only ever fixed by hand.
+          [ -n "$WWW" ] && upsert "$WWW" "ubuos-site.pages.dev" || true
 
       - name: Attach the domains to their Pages projects
         run: |
@@ -122,6 +130,7 @@ jobs:
           }
           attach ubuos-site "$APEX"
           attach ubuos-docs "$DOCS"
+          [ -n "$WWW" ] && attach ubuos-site "$WWW" || true
 
       - name: Wait for the certificates, then check
         run: |
@@ -129,7 +138,7 @@ jobs:
           # A new custom hostname serves 525/526 until its certificate is issued.
           # That window is normal and is not a misconfiguration, so this waits
           # rather than reporting a failure somebody would go and debug.
-          for host in "$APEX" "$DOCS"; do
+          for host in "$APEX" "$DOCS" ${WWW:+"$WWW"}; do
             for i in $(seq 1 20); do
               code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "https://$host" || true)
               if [ "$code" = "200" ]; then echo "  https://$host -> 200"; break; fi
