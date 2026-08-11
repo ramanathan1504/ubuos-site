@@ -77,6 +77,23 @@ jobs:
           test -f dist/index.html || { echo "no dist/index.html in ${{ matrix.dir }}"; exit 1; }
           echo "$(find dist -name '*.html' | wc -l) page(s) built"
 
+      - name: Create the Pages project if it does not exist
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' }}
+        # `pages deploy` fails outright on a project that does not exist yet, so
+        # the first deploy of a NEW site would always fail once and need somebody
+        # to go and click Create in a dashboard. The credential is already here;
+        # creating it is one call, and it is idempotent -- an existing project
+        # makes this a no-op rather than an error.
+        run: |
+          if npx --yes wrangler@latest pages project list 2>/dev/null \
+               | grep -qE "^\s*${{ matrix.project }}\s"; then
+            echo "project ${{ matrix.project }} already exists"
+          else
+            echo "creating project ${{ matrix.project }}"
+            npx --yes wrangler@latest pages project create ${{ matrix.project }} \
+              --production-branch=main
+          fi
+
       - name: Publish
         # Skipped rather than failed when the token is absent, so a fork's push
         # does not report a red build for a secret it was never going to have.
