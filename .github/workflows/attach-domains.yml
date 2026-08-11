@@ -1,0 +1,142 @@
+# Point ubuos.com and docs.ubuos.com at the two Pages projects.
+#
+# Run by hand, not on push: DNS is not something to re-apply on every commit, and
+# a workflow that rewrites records unprompted is one that will eventually rewrite
+# one somebody changed deliberately.
+#
+# It exists because "attach the domain in the dashboard" kept not producing a DNS
+# record, and a dashboard leaves nothing to read afterwards. Here every step says
+# what it found and what it changed, so a failure names its own cause instead of
+# being a page that does not load.
+name: Attach domains
+
+on:
+  workflow_dispatch:
+    inputs:
+      apex:
+        description: 'Apex domain'
+        default: 'ubuos.com'
+      docs:
+        description: 'Docs subdomain'
+        default: 'docs.ubuos.com'
+
+permissions:
+  contents: read
+
+jobs:
+  attach:
+    runs-on: ubuntu-latest
+    env:
+      CF_API: https://api.cloudflare.com/client/v4
+      TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      APEX: ${{ inputs.apex }}
+      DOCS: ${{ inputs.docs }}
+    steps:
+      - name: Check the credentials are present and valid
+        run: |
+          set -euo pipefail
+          [ -n "$TOKEN" ]   || { echo "::error::CLOUDFLARE_API_TOKEN is not set"; exit 1; }
+          [ -n "$ACCOUNT" ] || { echo "::error::CLOUDFLARE_ACCOUNT_ID is not set"; exit 1; }
+          ok=$(curl -sS "$CF_API/user/tokens/verify" -H "Authorization: Bearer $TOKEN" | jq -r .success)
+          [ "$ok" = "true" ] || { echo "::error::the token was rejected by Cloudflare"; exit 1; }
+          echo "token verified"
+
+      - name: Find the zone
+        id: zone
+        run: |
+          set -euo pipefail
+          # Looked up rather than configured: a hardcoded zone id is the kind of
+          # value that stays right until the zone is recreated, and then points
+          # confidently at nothing.
+          resp=$(curl -sS "$CF_API/zones?name=$APEX" -H "Authorization: Bearer $TOKEN")
+          if [ "$(echo "$resp" | jq -r .success)" != "true" ]; then
+            echo "::error::zone lookup failed — the token likely lacks Zone → Zone → Read"
+            echo "$resp" | jq -r '.errors[]?.message' | sed 's/^/  /'
+            exit 1
+          fi
+          id=$(echo "$resp" | jq -r '.result[0].id // empty')
+          if [ -z "$id" ]; then
+            echo "::error::$APEX is not a zone this token can see."
+            echo "This is the usual cause of 'I attached it but no record appeared':"
+            echo "the zone lives in a different Cloudflare account from the Pages projects."
+            exit 1
+          fi
+          echo "zone=$id" >> "$GITHUB_OUTPUT"
+          echo "zone $APEX -> $id"
+
+      - name: Create the DNS records
+        env:
+          ZONE: ${{ steps.zone.outputs.zone }}
+        run: |
+          set -euo pipefail
+          # CNAME at the apex is legal here because Cloudflare flattens it.
+          # Proxied is required, not cosmetic: a grey-cloud record resolves to
+          # pages.dev but Pages will not serve the custom hostname over it.
+          upsert() {
+            local name="$1" target="$2"
+            local existing
+            existing=$(curl -sS "$CF_API/zones/$ZONE/dns_records?name=$name" \
+                        -H "Authorization: Bearer $TOKEN" | jq -r '.result[0].id // empty')
+            local body
+            body=$(jq -nc --arg n "$name" --arg c "$target" \
+                    '{type:"CNAME", name:$n, content:$c, proxied:true, ttl:1}')
+            local resp method path
+            if [ -n "$existing" ]; then method=PUT;  path="/zones/$ZONE/dns_records/$existing"
+            else                        method=POST; path="/zones/$ZONE/dns_records"; fi
+            resp=$(curl -sS -X "$method" "$CF_API$path" \
+                    -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+                    --data "$body")
+            if [ "$(echo "$resp" | jq -r .success)" = "true" ]; then
+              echo "  $name -> $target (proxied)"
+            else
+              echo "::error::could not write $name — the token likely lacks Zone → DNS → Edit"
+              echo "$resp" | jq -r '.errors[]?.message' | sed 's/^/  /'
+              exit 1
+            fi
+          }
+          upsert "$APEX" "ubuos-site.pages.dev"
+          upsert "$DOCS" "ubuos-docs.pages.dev"
+
+      - name: Attach the domains to their Pages projects
+        run: |
+          set -euo pipefail
+          # The DNS record alone is not enough: Pages will not answer for a
+          # hostname it has not been told about, and will not issue a certificate
+          # for it either.
+          attach() {
+            local project="$1" host="$2" resp
+            resp=$(curl -sS -X POST \
+                    "$CF_API/accounts/$ACCOUNT/pages/projects/$project/domains" \
+                    -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+                    --data "$(jq -nc --arg n "$host" '{name:$n}')")
+            if [ "$(echo "$resp" | jq -r .success)" = "true" ]; then
+              echo "  $host attached to $project"
+            elif echo "$resp" | jq -r '.errors[]?.message' | grep -qi "already"; then
+              echo "  $host already attached to $project"
+            else
+              echo "::error::could not attach $host to $project — token likely lacks Account → Cloudflare Pages → Edit"
+              echo "$resp" | jq -r '.errors[]?.message' | sed 's/^/  /'
+              exit 1
+            fi
+          }
+          attach ubuos-site "$APEX"
+          attach ubuos-docs "$DOCS"
+
+      - name: Wait for the certificates, then check
+        run: |
+          set -euo pipefail
+          # A new custom hostname serves 525/526 until its certificate is issued.
+          # That window is normal and is not a misconfiguration, so this waits
+          # rather than reporting a failure somebody would go and debug.
+          for host in "$APEX" "$DOCS"; do
+            for i in $(seq 1 20); do
+              code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "https://$host" || true)
+              if [ "$code" = "200" ]; then echo "  https://$host -> 200"; break; fi
+              if [ "$i" = "20" ]; then
+                echo "::warning::https://$host is $code after ~5 minutes."
+                echo "Certificates can take longer on first issue; re-check shortly."
+              fi
+              sleep 15
+            done
+          done
