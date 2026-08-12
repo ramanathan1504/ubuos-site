@@ -45,6 +45,7 @@ export default defineConfig({
             { label: 'Install', slug: 'install' },
             { label: 'What it is', slug: 'what-it-is' },
             { label: 'How it fits together', slug: 'how-it-fits' },
+            { label: 'Connect your project', slug: 'connect' },
             { label: 'Finding things', slug: 'search' },
           ],
         },
