@@ -43,8 +43,9 @@ instead of leaving it on an old build.
 | Add | Gains |
 |---|---|
 | A runner extension | `does this actually run?` — real apps, real processes |
+| Nothing at all | search still works — see [Finding things](/search/) |
 | A memory extension | `have I worked this out before?` |
-| A local model | verdicts, and search by meaning |
+| A local model | verdicts, and conversation |
 | A cloud key | escalation only when a diff exceeds the local budget |
 
 ## Where things live
