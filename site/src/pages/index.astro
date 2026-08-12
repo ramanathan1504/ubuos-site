@@ -150,13 +150,16 @@ const extensions = (await getCollection('extensions')).sort((a, b) => a.data.ord
     .demo { margin-top: 32px; }
     .cta { margin-top: 24px; max-width: 620px; }
     .small { font-size: 14px; margin-top: 10px; }
-    .tagline { color: var(--fg) !important; font-weight: 520; margin-bottom: 8px !important; }
-    .mini { margin-top: 14px; font-size: 13px; }
-    .more { margin-top: 16px; }
+    .tagline { color: var(--fg) !important; font-weight: 520; margin-bottom: 6px !important; }
+    .mini { margin-top: 11px; font-size: 12.5px; }
+    .more { margin-top: 12px; }
     .more a { color: var(--accent); text-decoration: none; font-weight: 520; }
     .more a:hover { text-decoration: underline; }
     .status { margin-left: 8px; }
+    .steps { grid-template-columns: repeat(4, 1fr); }
     .steps .pill { margin-bottom: 8px; }
+    @media (max-width: 900px) { .steps { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .steps { grid-template-columns: 1fr; } }
     .steps h3 { margin-top: 2px; }
   </style>
 </Base>
