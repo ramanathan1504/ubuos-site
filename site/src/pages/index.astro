@@ -53,6 +53,43 @@ const extensions = (await getCollection('extensions')).sort((a, b) => a.data.ord
     </div>
   </section>
 
+  <section id="review">
+    <h2>The loop it closes</h2>
+    <p class="lede">
+      Reading a pull request is not the hard part. The parts that are — whether it
+      reproduces, and what you decided last time — are the parts nothing keeps for you.
+    </p>
+    <div class="grid steps">
+      <article class="card">
+        <span class="pill">1</span>
+        <h3>Read the facts</h3>
+        <p>Size, checks, files, who wrote it. <code>oss pr 4234 --repo owner/name</code></p>
+      </article>
+      <article class="card">
+        <span class="pill">2</span>
+        <h3>Find what you knew</h3>
+        <p>Related issues, prior fixes, your own notes — with no model needed.</p>
+      </article>
+      <article class="card">
+        <span class="pill">3</span>
+        <h3>Make it run</h3>
+        <p>Attach a runner and reproduce it for real, on the versions that matter.</p>
+      </article>
+      <article class="card">
+        <span class="pill">4</span>
+        <h3>Know when it moves</h3>
+        <p>
+          <code>oss followup</code> records the head you reviewed, and tells you when the
+          author pushes past it — across every project, in one list.
+        </p>
+      </article>
+    </div>
+    <p class="more dim">
+      A verdict on code that has since changed is worse than no verdict: it still
+      looks like a review.
+    </p>
+  </section>
+
   <section id="how">
     <h2>Nothing is mandatory</h2>
     <p class="lede">
@@ -119,5 +156,7 @@ const extensions = (await getCollection('extensions')).sort((a, b) => a.data.ord
     .more a { color: var(--accent); text-decoration: none; font-weight: 520; }
     .more a:hover { text-decoration: underline; }
     .status { margin-left: 8px; }
+    .steps .pill { margin-bottom: 8px; }
+    .steps h3 { margin-top: 2px; }
   </style>
 </Base>
