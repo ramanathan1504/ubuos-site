@@ -18,6 +18,8 @@ description: What each command is for.
 | `pr <n> --repo owner/name` | Every mechanical fact about a pull request |
 | `issue <n> --repo owner/name` | The report, as filed |
 | `followup` | What moved on a pull request since you reviewed it |
+| `hub` | Is anyone waiting on you — every project you follow, in one list |
+| `memory` | File, index and search your notes. Built in; an extension takes over |
 
 ## Extensions
 
