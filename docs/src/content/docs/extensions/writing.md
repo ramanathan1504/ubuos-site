@@ -105,31 +105,16 @@ unusable with nothing explaining why. That exact bug shipped once.
 
 ## A worked example you can read
 
-[**log4j2-workout**](https://github.com/ramanathan1504/log4j2-workout) is a real
-runner, not a toy. It runs Apache Log4j against nineteen applications across a
-version × configuration × application matrix, on real JVMs.
+[**log4j2-workout**](https://github.com/ramanathan1504/log4j2-workout) used to
+be the worked example here — until it stopped being an extension at all. It is
+now a **pack**: a `pack.sh` at the root, nineteen applications, and no
+`oss-ext.json`, driven by the engine that ships inside `oss`.
 
-Worth reading for three things it gets right:
-
-**The engine is separate from what it tests.** `bench` forks JVMs and walks a
-matrix; none of that is Log4j-specific. What *is* lives in `packs/log4j/pack.sh`
-— the version axis, the app axis, the app-to-module mapping. Pointing the same
-machinery at another project is one file:
-
-```bash
-BENCH_PACK=example ./bench list
-```
-
-`packs/example/` is there to be copied.
-
-**It declares only what it can do.** Reading a pull request moved to `oss pr`,
-because that needs an API call and nothing else. What stayed is what genuinely
-needs the bench — `pr --checkout`, `matrix`, `repro` — the things that build and
-execute.
-
-**It fails loudly rather than silently.** A missing pack names the ones that
-exist; a pack declaring no apps is refused at load, because an empty matrix
-reports `0 cells, 0 failures`, which reads exactly like a pass.
+That is the fate of most things that start as a runner extension, and it is a
+good fate. If your repository exists to be *run across versions and configs*,
+you want a pack, which is less work — see
+[Connect your project](/docs/connect/). An extension is for when you have a
+**tool of your own** that `oss` should call.
 
 ---
 

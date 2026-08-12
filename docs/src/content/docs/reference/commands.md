@@ -20,6 +20,11 @@ description: What each command is for.
 | `followup` | What moved on a pull request since you reviewed it |
 | `hub` | Is anyone waiting on you — every project you follow, in one list |
 | `memory` | File, index and search your notes. Built in; an extension takes over |
+| `pick` | What to work on next, scored against what you have already reviewed and written |
+| `backlog` | The whole backlog as one page: clusters, mergeable, one fix away |
+| `run` | Run a pack — `oss run --pack <dir> matrix …`. The engine ships with `oss` |
+| `model` | The optional local model that upgrades search from words to meaning |
+| `backup` / `restore` | Everything that cannot be re-derived, into one zip — `--to` a synced folder for off-machine copies |
 
 ## Extensions
 
