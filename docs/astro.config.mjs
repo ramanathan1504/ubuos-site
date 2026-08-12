@@ -44,6 +44,7 @@ export default defineConfig({
           items: [
             { label: 'Install', slug: 'install' },
             { label: 'What it is', slug: 'what-it-is' },
+            { label: 'How it fits together', slug: 'how-it-fits' },
             { label: 'Finding things', slug: 'search' },
           ],
         },
