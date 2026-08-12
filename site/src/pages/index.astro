@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import Terminal from '../components/Terminal.astro';
 
 // Sorted explicitly. "Whatever order the filesystem returned" is not an
 // editorial decision, and it changes silently when a file is renamed.
@@ -24,9 +25,11 @@ const extensions = (await getCollection('extensions')).sort((a, b) => a.data.ord
     <div class="cta">
       <pre><code>brew install ramanathan1504/oss-cli/oss</code></pre>
       <p class="dim small">
-        Java 17 and a GitHub token is the whole requirement. Everything else is optional.
+        A GitHub token is the whole requirement. No model, no server, no account.
       </p>
     </div>
+
+    <div class="demo"><Terminal /></div>
   </section>
 
   <section id="tools">
@@ -106,8 +109,9 @@ const extensions = (await getCollection('extensions')).sort((a, b) => a.data.ord
   </section>
 
   <style>
-    .hero { padding-top: clamp(64px, 11vw, 132px); }
-    .cta { margin-top: 34px; max-width: 620px; }
+    .hero { padding-top: clamp(40px, 6vw, 76px); }
+    .demo { margin-top: 32px; }
+    .cta { margin-top: 24px; max-width: 620px; }
     .small { font-size: 14px; margin-top: 10px; }
     .tagline { color: var(--fg) !important; font-weight: 520; margin-bottom: 8px !important; }
     .mini { margin-top: 14px; font-size: 13px; }
