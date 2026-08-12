@@ -22,7 +22,11 @@ import starlight from '@astrojs/starlight';
  * documentation instead of silently ageing into a frozen copy.
  */
 export default defineConfig({
-  site: 'https://docs.ubuos.com',
+  // One site, not two. A separate docs subdomain meant a second domain to bind,
+  // a second project to keep deployed, and a link that leaves the site to read
+  // the manual. Built with base '/docs' and dropped into the main output.
+  site: 'https://ubuos.com',
+  base: '/docs',
   integrations: [
     starlight({
       title: 'ubuos docs',

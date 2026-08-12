@@ -30,24 +30,15 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     # Job level, so the publish guard can actually see it. A step's own `env:` is
     # not in scope for that step's `if:`, which read as undefined -- and
     # undefined != '' is TRUE, so publishing ran with no token at all.
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-    strategy:
-      # Not fail-fast: if the catalogue breaks, the manual should still ship.
-      # They are independent sites and one being broken is not a reason to
-      # withhold the other.
-      fail-fast: false
-      matrix:
-        include:
-          - dir: site
-            project: ubuos-site
-          - dir: docs
-            project: ubuos-docs
-
     steps:
       - uses: actions/checkout@v4
 
@@ -59,23 +50,36 @@ jobs:
           node-version: '22.12.0'
 
       - name: Install
-        working-directory: ${{ matrix.dir }}
+        working-directory: site
         # `npm ci` needs a lockfile; `npm install` is used because the lockfiles
         # are gitignored here. Deterministic enough for a static site, and it
         # cannot fail on a lockfile that does not exist.
         run: npm install --no-audit --no-fund
 
       - name: Build
-        working-directory: ${{ matrix.dir }}
+        working-directory: site
         run: npm run build
 
+      - name: Build the docs into site/dist/docs
+        run: |
+          set -euo pipefail
+          cd docs
+          npm install --no-audit --no-fund
+          npm run build
+          cd ..
+          # Folded in rather than deployed separately: one project, one domain,
+          # and the manual is part of the site instead of a link away from it.
+          mkdir -p site/dist/docs
+          cp -R docs/dist/* site/dist/docs/
+
       - name: Check something was actually produced
-        working-directory: ${{ matrix.dir }}
+        working-directory: site
         # A build that succeeds and emits nothing would deploy an empty site over
         # a working one. Cheaper to catch here than to notice from a blank page.
         run: |
-          test -f dist/index.html || { echo "no dist/index.html in ${{ matrix.dir }}"; exit 1; }
-          echo "$(find dist -name '*.html' | wc -l) page(s) built"
+          test -f dist/index.html      || { echo "no dist/index.html"; exit 1; }
+          test -f dist/docs/index.html || { echo "docs missing from dist/docs"; exit 1; }
+          echo "$(find dist -name '*.html' | wc -l) page(s) built, docs included"
 
       - name: Create the Pages project if it does not exist
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' }}
@@ -91,11 +95,11 @@ jobs:
         # other failure is printed and fatal.
         run: |
           set -o pipefail
-          if out=$(npx --yes wrangler@latest pages project create ${{ matrix.project }} \
+          if out=$(npx --yes wrangler@latest pages project create ubuos-site \
                      --production-branch=main 2>&1); then
-            echo "created ${{ matrix.project }}"
+            echo "created ubuos-site"
           elif echo "$out" | grep -q "already exists"; then
-            echo "${{ matrix.project }} already exists"
+            echo "ubuos-site already exists"
           else
             echo "$out"
             exit 1
@@ -105,17 +109,17 @@ jobs:
         # Skipped rather than failed when the token is absent, so a fork's push
         # does not report a red build for a secret it was never going to have.
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' }}
-        working-directory: ${{ matrix.dir }}
+        working-directory: site
         run: |
           npx --yes wrangler@latest pages deploy dist \
-            --project-name=${{ matrix.project }} \
+            --project-name=ubuos-site \
             --branch=main \
             --commit-dirty=true
 
       - name: Say what to do if it was skipped
         if: ${{ env.CLOUDFLARE_API_TOKEN == '' }}
         run: |
-          echo "Built ${{ matrix.dir }} but did not publish: CLOUDFLARE_API_TOKEN is not set."
+          echo "Built the site but did not publish: CLOUDFLARE_API_TOKEN is not set."
           echo "Add these two repository secrets, then re-run:"
           echo "  CLOUDFLARE_API_TOKEN   — a token with Account → Cloudflare Pages → Edit"
           echo "  CLOUDFLARE_ACCOUNT_ID  — Cloudflare dashboard, right-hand sidebar"

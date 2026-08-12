@@ -3,13 +3,50 @@ title: Install
 description: Install oss, check it over, and attach what you want.
 ---
 
+### macOS — Homebrew
+
 ```bash
 brew install ramanathan1504/oss-cli/oss
+```
+
+### Linux — Debian and Ubuntu
+
+```bash
+curl -LO https://github.com/ramanathan1504/oss-cli/releases/latest/download/oss_1.7.1_amd64.deb
+sudo dpkg -i oss_*.deb
+```
+
+### Windows — Chocolatey
+
+```powershell
+choco install oss
+```
+
+### Any platform — the archive
+
+```bash
+curl -LO https://github.com/ramanathan1504/oss-cli/releases/latest/download/oss-linux-x64.tar.gz
+tar -xzf oss-linux-x64.tar.gz
+sudo mv oss-linux-x64 /opt/oss && sudo ln -s /opt/oss/oss /usr/local/bin/oss
+```
+
+Available as `oss-macos-arm64.tar.gz`, `oss-linux-x64.tar.gz` and
+`oss-windows-x64.zip`.
+
+```bash
 oss --version
 ```
 
-That is the whole requirement: **Java 17 and a GitHub token.** Everything below is
-optional, and `oss` works with none of it.
+**No Java needed.** Every download carries its own runtime, so a GitHub token is
+the only requirement. Everything below is optional, and `oss` works with none of
+it.
+
+:::note
+There is no Intel macOS build. GitHub retired those runners, so there is nothing
+to build one *on* — and an archive built elsewhere would carry a runtime that
+looks correct and does not run. Intel Macs can still run the jar with their own
+Java 17.
+:::
 
 ## Check it over
 
@@ -43,7 +80,7 @@ instead of leaving it on an old build.
 | Add | Gains |
 |---|---|
 | A runner extension | `does this actually run?` — real apps, real processes |
-| Nothing at all | search still works — see [Finding things](/search/) |
+| Nothing at all | search still works — see [Finding things](/docs/search/) |
 | A memory extension | `have I worked this out before?` |
 | A local model | verdicts, and conversation |
 | A cloud key | escalation only when a diff exceeds the local budget |

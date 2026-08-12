@@ -35,4 +35,4 @@ comment reaches every watcher and the mailing list the instant it is sent, and
 deleting it afterwards reaches neither.
 
 So **every outward write is refused by default, everywhere, and there is no
-setting that changes it.** See [Writing upstream](/reference/upstream/).
+setting that changes it.** See [Writing upstream](/docs/reference/upstream/).
