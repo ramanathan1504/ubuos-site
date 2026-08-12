@@ -1,0 +1,91 @@
+# Retire docs.ubuos.com.
+#
+# The manual moved to ubuos.com/docs, so the subdomain, its DNS record and the
+# Pages project that served it are all dead weight. Left in place they are worse
+# than dead: a stale copy of the documentation stays reachable and answerable by
+# search engines, and the version somebody lands on is the one nobody is
+# updating.
+#
+# Requires typing the hostname to run, because it deletes DNS and a Pages
+# project. A workflow_dispatch button next to "deploy" is too easy to press by
+# accident for something with no undo.
+name: Retire docs subdomain
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type the hostname to retire (docs.ubuos.com)'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  retire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CF_API: https://api.cloudflare.com/client/v4
+      TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      HOST: docs.ubuos.com
+      PROJECT: ubuos-docs
+    steps:
+      - name: Check the confirmation matches
+        run: |
+          set -euo pipefail
+          [ "${{ inputs.confirm }}" = "$HOST" ] || {
+            echo "::error::type $HOST exactly to confirm — nothing was changed"; exit 1; }
+          [ -n "$TOKEN" ] || { echo "::error::CLOUDFLARE_API_TOKEN is not set"; exit 1; }
+
+      - name: Detach the custom domain from the Pages project
+        run: |
+          set -euo pipefail
+          # Detach BEFORE removing DNS. The other order leaves Pages holding a
+          # hostname it can no longer verify, which is the state that produces a
+          # certificate error rather than a clean 404.
+          resp=$(curl -sS -X DELETE \
+            "$CF_API/accounts/$ACCOUNT/pages/projects/$PROJECT/domains/$HOST" \
+            -H "Authorization: Bearer $TOKEN")
+          if [ "$(echo "$resp" | jq -r .success)" = "true" ]; then
+            echo "  detached $HOST from $PROJECT"
+          else
+            # Already gone is a success for this purpose: the end state is what matters.
+            echo "$resp" | jq -r '.errors[]?.message' | sed 's/^/  /'
+            echo "  (continuing — the goal is that it is not attached)"
+          fi
+
+      - name: Delete the DNS record
+        run: |
+          set -euo pipefail
+          zone=$(curl -sS "$CF_API/zones?name=ubuos.com" -H "Authorization: Bearer $TOKEN" \
+                 | jq -r '.result[0].id // empty')
+          [ -n "$zone" ] || { echo "::error::zone not visible to this token"; exit 1; }
+          id=$(curl -sS "$CF_API/zones/$zone/dns_records?name=$HOST" \
+               -H "Authorization: Bearer $TOKEN" | jq -r '.result[0].id // empty')
+          if [ -z "$id" ]; then
+            echo "  no DNS record for $HOST"
+          else
+            curl -sS -X DELETE "$CF_API/zones/$zone/dns_records/$id" \
+              -H "Authorization: Bearer $TOKEN" | jq -r '"  deleted: " + (.success|tostring)'
+          fi
+
+      - name: Delete the Pages project
+        run: |
+          set -euo pipefail
+          resp=$(curl -sS -X DELETE "$CF_API/accounts/$ACCOUNT/pages/projects/$PROJECT" \
+                 -H "Authorization: Bearer $TOKEN")
+          echo "$resp" | jq -r 'if .success then "  deleted project '"$PROJECT"'" else ("  " + (.errors[]?.message // "already gone")) end'
+
+      - name: Confirm it is gone
+        run: |
+          set -euo pipefail
+          # A stale copy still answering is the failure this exists to prevent, so
+          # check rather than assume.
+          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "https://$HOST" || true)
+          echo "  https://$HOST -> $code"
+          case "$code" in
+            200) echo "::warning::$HOST still answers. DNS may be cached; re-check shortly." ;;
+            *)   echo "  retired" ;;
+          esac
