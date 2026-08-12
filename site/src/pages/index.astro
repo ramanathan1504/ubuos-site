@@ -128,10 +128,12 @@ const extensions = (await getCollection('extensions')).sort((a, b) => a.data.ord
   </section>
 
   <section id="extensions">
-    <h2>Extensions</h2>
+    <h2>Two extensions, and packs</h2>
     <p class="lede">
-      An extension is a directory with one JSON file in it. Write it in anything — it is
-      run as a process, not loaded as a plugin.
+      An <strong>extension</strong> is a capability you attach: one runs things, one
+      remembers them. A <strong>pack</strong> is what a runner runs <em>against</em> — the
+      applications, configurations and versions. Swapping the pack points the same
+      machinery at your project.
     </p>
     <div class="grid">
       {extensions.map((e) => (
