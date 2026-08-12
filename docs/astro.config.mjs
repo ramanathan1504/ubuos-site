@@ -40,6 +40,7 @@ export default defineConfig({
           items: [
             { label: 'Install', slug: 'install' },
             { label: 'What it is', slug: 'what-it-is' },
+            { label: 'Finding things', slug: 'search' },
           ],
         },
         {
