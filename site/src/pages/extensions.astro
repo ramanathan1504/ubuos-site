@@ -11,11 +11,17 @@ const extensions = (await getCollection('extensions')).sort((a, b) => a.data.ord
 >
   <section>
     <p class="pill">Extensions</p>
-    <h1>Anything can be an extension.</h1>
+    <h1>Two extensions. Any number of packs.</h1>
     <p class="lede">
-      There is no SDK to depend on and no interface to implement. An extension is a
-      directory containing one file, and it is run as a child process — so it can be
-      bash, Python, Go, or a binary somebody handed you.
+      An <strong>extension</strong> is a capability: one <em>runs</em> things, one
+      <em>remembers</em> them. There is no SDK and no interface to implement — it is a
+      directory with one JSON file, run as a child process, so it can be written in
+      anything.
+    </p>
+    <p class="lede" style="margin-top:12px">
+      A <strong>pack</strong> is what a runner runs against: the applications, the
+      configurations, the versions. The engine does not know what it is testing, which is
+      why pointing it at your project is one file rather than a fork.
     </p>
   </section>
 
