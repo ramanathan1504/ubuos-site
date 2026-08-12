@@ -23,13 +23,31 @@ const extensions = (await getCollection('extensions')).sort((a, b) => a.data.ord
     </p>
 
     <div class="cta">
-      <pre><code>brew install ramanathan1504/oss-cli/oss</code></pre>
+      <!-- Static-first: macOS is visible before any JS runs, so the frame that
+           matters most never depends on a script. -->
+      <div class="ostabs" role="tablist" aria-label="Install">
+        <button class="ostab on" data-os="mac" role="tab" aria-selected="true"> macOS</button>
+        <button class="ostab" data-os="linux" role="tab" aria-selected="false">🐧 Linux</button>
+        <button class="ostab" data-os="win" role="tab" aria-selected="false">⊞ Windows</button>
+      </div>
+      <pre class="install" data-os="mac"><code>brew install ramanathan1504/oss-cli/oss</code></pre>
+      <pre class="install hide" data-os="linux"><code>curl -LO https://github.com/ramanathan1504/oss-cli/releases/latest/download/oss_amd64.deb
+sudo dpkg -i oss_amd64.deb</code></pre>
+      <pre class="install hide" data-os="win"><code>choco install oss --source .\oss.nupkg   # from the release assets
+wsl oss run …                             # packs run under WSL</code></pre>
       <p class="dim small">
-        A GitHub token is the whole requirement. No model, no server, no account.
+        Self-contained — carries its own Java. A GitHub token is the whole requirement.
+        No model, no server, no account.
       </p>
     </div>
 
     <div class="demo"><Terminal /></div>
+
+    <div class="chips" aria-label="Commands">
+      {['pr', 'review', 'followup', 'hub', 'pick', 'backlog', 'search', 'memory', 'run', 'model', 'backup'].map((c) => (
+        <a class="chip" href="/docs/reference/commands/"><code>{c}</code></a>
+      ))}
+    </div>
   </section>
 
   <section id="tools">
@@ -128,12 +146,13 @@ const extensions = (await getCollection('extensions')).sort((a, b) => a.data.ord
   </section>
 
   <section id="extensions">
-    <h2>Two extensions, and packs</h2>
+    <h2>Packs, and extensions</h2>
     <p class="lede">
-      An <strong>extension</strong> is a capability you attach: one runs things, one
-      remembers them. A <strong>pack</strong> is what a runner runs <em>against</em> — the
-      applications, configurations and versions. Swapping the pack points the same
-      machinery at your project.
+      A <strong>pack</strong> is your playground: your applications, configurations and
+      versions, described in one <code>pack.sh</code>. The engine that walks it ships
+      inside <code>oss</code> — <code>oss run --pack ~/your-repo matrix</code> and nothing
+      is registered. An <strong>extension</strong> is for a tool of your own that
+      <code>oss</code> should call.
     </p>
     <div class="grid">
       {extensions.map((e) => (
@@ -144,8 +163,38 @@ const extensions = (await getCollection('extensions')).sort((a, b) => a.data.ord
         </article>
       ))}
     </div>
-    <p class="more"><a href="/extensions">How to write one →</a></p>
+    <p class="more"><a href="/docs/connect/">Connect your project — pack or extension →</a></p>
   </section>
+
+  <script is:inline>
+    (() => {
+      // Install tabs. Buttons swap which <pre> shows; static default is macOS.
+      document.querySelectorAll('.ostab').forEach((b) => {
+        b.addEventListener('click', () => {
+          document.querySelectorAll('.ostab').forEach((x) => {
+            x.classList.toggle('on', x === b);
+            x.setAttribute('aria-selected', x === b ? 'true' : 'false');
+          });
+          document.querySelectorAll('.install').forEach((p) => {
+            p.classList.toggle('hide', p.dataset.os !== b.dataset.os);
+          });
+        });
+      });
+
+      // Sections rise in as they enter the viewport. Content is fully visible
+      // without JS or with reduced motion -- the animation is seasoning, never
+      // the meal.
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const io = new IntersectionObserver((es) => {
+        es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+      }, { threshold: 0.12 });
+      document.querySelectorAll('section').forEach((sec, i) => {
+        if (i === 0) return;               // the hero is already on screen
+        sec.classList.add('reveal');
+        io.observe(sec);
+      });
+    })();
+  </script>
 
   <style>
     .hero { padding-top: clamp(40px, 6vw, 76px); }
@@ -163,5 +212,29 @@ const extensions = (await getCollection('extensions')).sort((a, b) => a.data.ord
     @media (max-width: 900px) { .steps { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 560px) { .steps { grid-template-columns: 1fr; } }
     .steps h3 { margin-top: 2px; }
+
+    .ostabs { display: flex; gap: 6px; margin-bottom: 10px; }
+    .ostab {
+      font: inherit; font-size: 13px; padding: 6px 13px;
+      border: 1px solid var(--line); border-radius: 999px;
+      background: transparent; color: var(--muted); cursor: pointer;
+      transition: color .15s, border-color .15s, background .15s;
+    }
+    .ostab:hover { color: var(--fg); }
+    .ostab.on { color: var(--fg); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 9%, transparent); }
+    .install.hide { display: none; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+    .chip {
+      text-decoration: none; font-size: 12.5px;
+      padding: 5px 11px; border: 1px solid var(--line); border-radius: 999px;
+      color: var(--muted); background: var(--card);
+      transition: transform .15s, color .15s, border-color .15s;
+    }
+    .chip:hover { color: var(--accent); border-color: var(--accent); transform: translateY(-1px); }
+    .chip code { background: none; padding: 0; font-size: inherit; color: inherit; }
+
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: none; }
   </style>
 </Base>
