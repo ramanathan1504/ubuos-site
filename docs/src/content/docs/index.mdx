@@ -5,28 +5,43 @@ template: splash
 hero:
   tagline: The context you already have, assembled before you need it.
   actions:
+    # Starlight does not apply `base` to these links, so they carry /docs/
+    # themselves. A bare /install/ here pointed at the catalogue site, which
+    # has no such page — the landing's only button was a 404.
     - text: Install
-      link: /install/
+      link: /docs/install/
       icon: right-arrow
-    - text: Source
-      link: https://github.com/ramanathan1504/oss-cli
-      icon: external
+    - text: The commands
+      link: /docs/reference/commands/
+      icon: open-book
       variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+{/* LinkCards, not Cards: a landing page whose tiles cannot be clicked is a
+    dead end, and with `template: splash` there is no sidebar to fall back
+    on — these links are the only way into the manual from here. */}
 
 <CardGrid stagger>
-  <Card title="Works with nothing else" icon="approve-check">
-    Java 17 and a GitHub token. Storing, filing and finding by keyword need no AI at all.
-  </Card>
-  <Card title="Attach a runner" icon="rocket">
-    Answers *does this actually run?* — the one question reading the code cannot settle.
-  </Card>
-  <Card title="Attach a memory" icon="open-book">
-    Plain Markdown on your disk, filed by topic, readable in ten years.
-  </Card>
-  <Card title="Nothing leaves without asking" icon="warning">
-    Writing to a public repository is refused unless you name it and confirm — every time.
-  </Card>
+  <LinkCard
+    title="What it is"
+    href="/docs/what-it-is/"
+    description="A GitHub token is the whole requirement — every download carries its own runtime. Storing, filing and finding by keyword need no AI at all."
+  />
+  <LinkCard
+    title="How it fits together"
+    href="/docs/how-it-fits/"
+    description="One core; a runner answers does it run, a memory answers have I seen this before."
+  />
+  <LinkCard
+    title="Connect your project"
+    href="/docs/connect/"
+    description="A pack or an extension — settled in ten seconds, then the whole walkthrough of each."
+  />
+  <LinkCard
+    title="Every command"
+    href="/docs/reference/commands/"
+    description="Grouped by the question it answers, with what each one needs to run."
+  />
 </CardGrid>
