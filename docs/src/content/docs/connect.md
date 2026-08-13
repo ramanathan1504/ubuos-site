@@ -87,18 +87,20 @@ error; this one does not. If you pass the wrong property, most frameworks fall
 back to a default configuration and log happily — so the run *passes*, having
 tested nothing at all.
 
-Log4j is the canonical example: version 3 reads
-`log4j.configuration.location`, version 2 reads `log4j.configurationFile`, and
-passing the 2 spelling to 3 produces a clean green column that exercised the
-default config. Check the artefact, never the exit code.
+The canonical shape: a framework renames its configuration property between
+major versions, so the spelling that version 2 reads is not the one version 3
+reads. Pass the older spelling to the newer release and nothing errors — you get
+a clean green column that exercised the default config. Check the artefact,
+never the exit code.
 :::
 
 ### A worked example you can copy
 
 `runner/packs/example/pack.sh` ships with `oss` — about thirty lines, and it
-runs. [**log4j2-workout**](https://github.com/ramanathan1504/log4j2-workout) is
-the real one: nineteen applications across a version × configuration ×
-application matrix, and its `pack.sh` is 88 lines.
+runs. Copy the directory, change the five declarations, and the engine runs
+against your project instead. A production pack is not much larger: a real one
+covering nineteen applications across a version × configuration × application
+matrix declares it all in 88 lines.
 
 Full field list: `runner/README.md` in
 [`oss`](https://github.com/ramanathan1504/oss-cli).

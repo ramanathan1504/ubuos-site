@@ -4,20 +4,20 @@ description: Attach a runner or a memory by path — nothing is uploaded or copi
 ---
 
 ```bash
-oss ext add ~/apache/log4j2-workout
+oss ext add ~/path/to/your-runner
 oss ext list
 ```
 
 ```
 NAME           KIND   STATE     VERBS
-log4j          runner ok        list, run, matrix, coverage, repro, review, …
+your-runner    runner ok        list, run, matrix, coverage, repro, review, …
 devon          memory ok        file, index, harvest, map, digest, doctor
 ```
 
 Then use them through the core:
 
 ```bash
-oss run --name log4j list --apps
+oss run --name your-runner list --apps
 oss memory doctor
 ```
 
