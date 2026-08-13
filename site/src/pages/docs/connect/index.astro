@@ -1,0 +1,149 @@
+---
+import Base from '../../../layouts/Base.astro';
+---
+
+<Base
+  title="Connect your project — ubuos docs"
+  description="Build a pack so the engine can run your applications across your versions, or register an extension so oss can call a tool of your own."
+>
+  <section>
+    <p class="pill">Docs · Connect</p>
+    <h1>Point it at your own project.</h1>
+    <p class="lede">
+      There are two ways in, and they answer different questions. A
+      <strong>pack</strong> is data: your applications, configurations and versions,
+      described in one file, walked by the engine that ships inside <code>oss</code>.
+      An <strong>extension</strong> is a tool: a program of your own that
+      <code>oss</code> should call. If you want <em>does this change actually
+      run?</em> answered against your project, you want a pack.
+    </p>
+  </section>
+
+  <section class="tight">
+    <h2>Build a pack</h2>
+    <p class="lede">
+      The engine walks a version × configuration × application matrix, forks a real
+      JVM per cell, and reports what happened. It knows how to <em>run</em> things;
+      it knows nothing about what it is running. What it runs is your repository —
+      a directory holding a <code>pack.sh</code> and the applications and
+      configurations that file names. Nothing is registered and nothing is forked:
+      you pass the path.
+    </p>
+
+    <pre class="block"><code>{`oss run --pack ~/my-kafka-bench list --apps
+oss run --pack ~/my-kafka-bench matrix --scenario smoke --version 4.0.0
+
+# or from inside the pack directory, --pack is implied
+cd ~/my-kafka-bench && oss run list`}</code></pre>
+
+    <h3 class="step">1 · Copy the example</h3>
+    <p class="body">
+      The engine's repository carries a working pack of about thirty lines,
+      <code>runner/packs/example/pack.sh</code>. Copy it into your own repository and
+      change the declarations. This is the whole of it:
+    </p>
+
+    <pre class="block"><code>{`PACK_NAME="example"
+PACK_DESC="A worked example — copy this to point the engine at your project"
+
+PACK_CONFIGS_DIR="configs"
+PACK_APPS_DIR="apps"
+
+VERSIONS=(1.0.0 1.1.0)
+DEFAULT_VERSION=1.1.0
+
+APPS=(hello)
+
+pack_module_path() {
+  case "$1" in
+    hello) echo "apps/hello" ;;
+    *) return 1 ;;
+  esac
+}`}</code></pre>
+
+    <h3 class="step">2 · The contract</h3>
+    <p class="body">
+      A pack declares axes and answers questions. Everything the engine reads,
+      nothing it writes back:
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <tbody>
+          <tr><td><code>PACK_NAME</code>, <code>PACK_DESC</code></td><td>what this is</td></tr>
+          <tr><td><code>VERSIONS</code>, <code>DEFAULT_VERSION</code></td><td>the version axis</td></tr>
+          <tr><td><code>APPS</code>, <code>pack_module_path</code></td><td>the application axis, and where each one lives</td></tr>
+          <tr><td><code>PACK_APPS_DIR</code>, <code>PACK_CONFIGS_DIR</code></td><td>where to look, relative to the pack</td></tr>
+          <tr><td><code>pack_build_flags</code>, <code>pack_gradle_version_flag</code></td><td>how a version reaches the build</td></tr>
+          <tr><td><code>pack_config_args</code></td><td><strong>how an application is told where its configuration is</strong></td></tr>
+          <tr><td><code>pack_main_class_for</code></td><td>how to start one</td></tr>
+          <tr><td><code>pack_jvm_args</code>, <code>pack_always_jvm_args</code></td><td>flags an application or the project needs</td></tr>
+          <tr><td><code>pack_skip_reason</code>, <code>pack_min_java_for</code>, <code>pack_min_version_for</code></td><td>which cells are impossible, and why</td></tr>
+          <tr><td><code>pack_source_clone</code>, <code>pack_modules</code>, <code>pack_modules_on_classpath</code></td><td>for <code>coverage</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="body">
+      <code>pack_config_args</code> is the one to get right, because it is the only
+      one that punishes a guess <em>silently</em>. Pass Log4j&nbsp;2's property name to
+      Log4j&nbsp;3 and nothing errors — the framework falls back to its default
+      configuration and logs happily, and an entire column of your matrix passes
+      while testing nothing at all. If a cell stored less than you expected, suspect
+      this before suspecting the configuration.
+    </p>
+
+    <h3 class="step">3 · A finished pack to read</h3>
+    <p class="body">
+      When the thirty-line example feels too thin, read a full-sized one:
+      <a href="https://github.com/ramanathan1504/log4j2-workout">log4j2-workout</a>
+      wires nineteen real applications, seventy-three configurations and seven
+      Log4j versions into a single <code>pack.sh</code> — including build flags per
+      version line, per-application JVM args, and the pruning rules that mark
+      impossible cells as <code>SKIP</code> with a reason. It is what the PR
+      extension runs against by default, and every declaration in the contract
+      table appears in it, exercised for real.
+    </p>
+
+    <p class="note">
+      The engine is bash and forks Maven, Gradle and JVMs — it runs on macOS and
+      Linux, and on Windows under WSL. <code>oss run</code> says so up front rather
+      than failing halfway through a build.
+    </p>
+  </section>
+
+  <section class="tight">
+    <h2>Register an extension</h2>
+    <p class="lede">
+      An extension is for a tool of your own — one that <em>runs</em> things or one
+      that <em>remembers</em> them. There is no SDK: it is a directory with one
+      <code>oss-ext.json</code>, run as a child process, so it can be written in
+      anything.
+    </p>
+    <pre class="block"><code>{`oss ext add /path/to/your/repo
+oss ext list`}</code></pre>
+    <p class="more"><a href="/extensions">The extension format, and the two that exist →</a></p>
+  </section>
+
+  <style>
+    .tight { padding-top: 0; }
+    .step { margin-top: 34px; font-size: 15px; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
+    .body { color: var(--muted); max-width: var(--measure); margin: 10px 0 0; }
+    .body a { color: var(--accent); }
+    .block { margin-top: 16px; }
+    .note {
+      margin-top: 26px; max-width: var(--measure); color: var(--muted);
+      border-left: 2px solid var(--accent); padding-left: 14px;
+    }
+    .more { margin-top: 14px; }
+    .more a { color: var(--accent); text-decoration: none; font-weight: 520; }
+    .more a:hover { text-decoration: underline; }
+
+    .table-wrap { margin-top: 16px; overflow-x: auto; border: 1px solid var(--line); border-radius: 9px; background: var(--card); }
+    table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14.5px; }
+    td { padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    td:first-child { white-space: nowrap; }
+    tr:last-child td { border-bottom: 0; }
+    td code { background: none; padding: 0; }
+  </style>
+</Base>
