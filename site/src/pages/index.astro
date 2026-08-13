@@ -51,7 +51,7 @@ wsl oss run …                             # packs run under WSL</code></pre>
   </section>
 
   <section id="tools">
-    <h2>The tools</h2>
+    <h2>The tool</h2>
     <p class="lede">One core. Everything else attaches to it.</p>
     <div class="grid">
       {tools.map((t) => (
@@ -69,6 +69,7 @@ wsl oss run …                             # packs run under WSL</code></pre>
         </article>
       ))}
     </div>
+    <p class="more"><a href="/docs/connect/">Point it at your own project — build a pack →</a></p>
   </section>
 
   <section id="review">
@@ -185,9 +186,12 @@ wsl oss run …                             # packs run under WSL</code></pre>
       // without JS or with reduced motion -- the animation is seasoning, never
       // the meal.
       if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      // threshold 0: any visible pixel reveals the section. A fraction threshold
+      // can leave a tall section invisible on a short viewport — content held at
+      // opacity 0 reads as a page full of empty space.
       const io = new IntersectionObserver((es) => {
         es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
-      }, { threshold: 0.12 });
+      }, { threshold: 0 });
       document.querySelectorAll('section').forEach((sec, i) => {
         if (i === 0) return;               // the hero is already on screen
         sec.classList.add('reveal');
@@ -197,9 +201,9 @@ wsl oss run …                             # packs run under WSL</code></pre>
   </script>
 
   <style>
-    .hero { padding-top: clamp(40px, 6vw, 76px); }
-    .demo { margin-top: 32px; }
-    .cta { margin-top: 24px; max-width: 620px; }
+    .hero { padding-top: clamp(28px, 4.5vw, 52px); }
+    .demo { margin-top: 24px; }
+    .cta { margin-top: 20px; max-width: 620px; }
     .small { font-size: 14px; margin-top: 10px; }
     .tagline { color: var(--fg) !important; font-weight: 520; margin-bottom: 6px !important; }
     .mini { margin-top: 11px; font-size: 12.5px; }
@@ -224,7 +228,7 @@ wsl oss run …                             # packs run under WSL</code></pre>
     .ostab.on { color: var(--fg); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 9%, transparent); }
     .install.hide { display: none; }
 
-    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
     .chip {
       text-decoration: none; font-size: 12.5px;
       padding: 5px 11px; border: 1px solid var(--line); border-radius: 999px;

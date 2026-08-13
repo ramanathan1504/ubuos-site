@@ -1,0 +1,117 @@
+---
+import Base from '../../../layouts/Base.astro';
+---
+
+<Base
+  title="Getting started — ubuos docs"
+  description="From install to first review: token, doctor, sync, review — and the optional layers you can add later."
+>
+  <section>
+    <p class="pill">Docs · Getting started</p>
+    <h1>From install to first review.</h1>
+    <p class="lede">
+      A GitHub token is the whole requirement. Everything else — a local model, a
+      notes corpus, a pack to run against — is a layer you add when you want it,
+      and every answer states which layers it actually used.
+    </p>
+  </section>
+
+  <section class="tight">
+    <h3 class="step">1 · Install, and check</h3>
+    <p class="body">
+      One command per platform — the <a href="/#top">homepage</a> has all three.
+      Then let <code>doctor</code> tell you what is connected and what is not:
+    </p>
+    <pre class="block"><code>{`brew install ramanathan1504/oss-cli/oss   # macOS; Linux and Windows on the homepage
+
+oss doctor`}</code></pre>
+    <p class="body">
+      <code>doctor</code> checks every prerequisite at once and says exactly what to
+      fix — including which token it found and which data directory it will write
+      to. If it is happy, everything below works.
+    </p>
+
+    <h3 class="step">2 · Follow a repository</h3>
+    <pre class="block"><code>{`oss sync --add apache/kafka   # register it, and build its convention profile
+oss sync --all                # pull issues and pull requests into local SQLite`}</code></pre>
+    <p class="body">
+      No clone, any language. Facts come from the GitHub API and are cached
+      locally, so everything after a sync is fast and works offline.
+    </p>
+
+    <h3 class="step">3 · Ask the questions you actually have</h3>
+    <pre class="block"><code>{`oss pr 4234 --repo apache/kafka   # every mechanical fact about a pull request
+oss review 4234                   # review it from every source you have connected
+oss followup                      # what moved since you reviewed it
+oss hub                           # is anyone waiting on you?`}</code></pre>
+    <p class="body">
+      <code>review</code> is built as a ladder: facts need only the token; convention
+      checks, your own notes, and a local verdict each switch on when their layer is
+      present. The output names the layers it used, so a thin review is never
+      mistaken for a clean one.
+    </p>
+
+    <h3 class="step">4 · Add layers when you want them</h3>
+    <div class="table-wrap">
+      <table>
+        <tbody>
+          <tr>
+            <td><code>oss model</code></td>
+            <td>A local model via Ollama. Upgrades <code>search</code> from words to
+            meaning and adds local verdicts. Nothing is sent anywhere.</td>
+          </tr>
+          <tr>
+            <td><code>oss setup</code></td>
+            <td>Point it at note folders you already keep; past investigations become
+            retrievable evidence. Feed it clean text — it stores what you give it,
+            verbatim.</td>
+          </tr>
+          <tr>
+            <td><a href="/docs/connect/">a pack</a></td>
+            <td>Your applications and versions, so <em>does this change actually
+            run?</em> has an answer rather than an opinion.</td>
+          </tr>
+          <tr>
+            <td><a href="/extensions">an extension</a></td>
+            <td>A tool of your own that <code>oss</code> should call — a runner or a
+            memory, attached with <code>oss ext add</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="step">5 · Keep what cannot be re-derived</h3>
+    <pre class="block"><code>{`oss backup                 # portable archive of the database and memory; keeps the last five
+oss restore <archive.zip>  # restore without overwriting your local credentials`}</code></pre>
+    <p class="note">
+      Everything lives under <code>~/.oss-cli</code> — one directory to move, one to
+      back up. Backups contain the full text of everything you ingested: if a secret
+      ever went in, rotating that credential is the remedy, not deleting rows.
+    </p>
+
+    <p class="more"><a href="/docs/reference/commands/">Every command, grouped by question →</a></p>
+  </section>
+
+  <style>
+    .tight { padding-top: 0; }
+    .step { margin-top: 34px; font-size: 15px; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
+    .body { color: var(--muted); max-width: var(--measure); margin: 10px 0 0; }
+    .body a { color: var(--accent); }
+    .block { margin-top: 16px; }
+    .note {
+      margin-top: 26px; max-width: var(--measure); color: var(--muted);
+      border-left: 2px solid var(--accent); padding-left: 14px;
+    }
+    .more { margin-top: 26px; }
+    .more a { color: var(--accent); text-decoration: none; font-weight: 520; }
+    .more a:hover { text-decoration: underline; }
+
+    .table-wrap { margin-top: 16px; overflow-x: auto; border: 1px solid var(--line); border-radius: 9px; background: var(--card); }
+    table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14.5px; }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    td:first-child { white-space: nowrap; }
+    td:first-child a { color: var(--accent); }
+    tr:last-child td { border-bottom: 0; }
+    td code { background: none; padding: 0; }
+  </style>
+</Base>

@@ -1,0 +1,139 @@
+---
+import Base from '../../../../layouts/Base.astro';
+
+/**
+ * Grouped from `oss --help` (1.8.1). The one-line descriptions are the CLI's
+ * own. When this page and the CLI disagree, the CLI is right — run
+ * `oss <command> --help` for flags; this page only says what each command
+ * is for and what it needs.
+ */
+const groups = [
+  {
+    title: 'Facts from GitHub',
+    needs: 'a token',
+    blurb: 'No clone, any language. Everything comes from the API and is cached locally.',
+    cmds: [
+      ['pr <n>', 'Every mechanical fact about a pull request'],
+      ['issue <n>', 'Read an issue as it was filed'],
+      ['prs', 'Cached open pull requests: stale status, reviews, critical fixes'],
+      ['sync', 'Pull live issues and PRs into local SQLite'],
+      ['profile', "A repository's language, build and convention profile"],
+      ['onboard', 'What a project expects before you contribute to it'],
+    ],
+  },
+  {
+    title: 'The review loop',
+    needs: 'a token',
+    blurb: 'Reviewing, and knowing when a review has gone stale.',
+    cmds: [
+      ['review <n>', 'Review a pull request using every source you have connected'],
+      ['followup', 'What moved on a reviewed pull request since you reviewed it'],
+      ['hub', 'Is anyone waiting on you? Every project you follow, in one list'],
+      ['pick', 'What to work on next, scored against what you have already worked on'],
+      ['backlog', 'The whole backlog as one page: clusters, mergeable, one fix away'],
+    ],
+  },
+  {
+    title: 'Running and remembering',
+    needs: 'a pack or an extension',
+    blurb: 'The two questions the core cannot answer alone: does it run, and have I seen this before.',
+    cmds: [
+      ['run (alias: bench)', 'Run something real through an attached runner, or any pack by path'],
+      ['memory (alias: kb)', 'File, index or search through your memory — built in; an extension takes over'],
+      ['ext', 'Attach and inspect runners and memories'],
+      ['serve', 'Run oss as a local service with a palette of attached extensions'],
+    ],
+  },
+  {
+    title: 'Local analysis',
+    needs: 'nothing, or Ollama where marked',
+    blurb: 'Offline, over what sync already fetched. Nothing leaves your machine.',
+    cmds: [
+      ['search <query>', 'Semantic search over the synced backlog (Ollama)'],
+      ['critical', 'Fast keyword-score severity ranking — no model involved'],
+      ['analyze', 'Batch severity analysis of open issues (Ollama)'],
+      ['duplicates', 'Duplicate issue clusters via local vector embeddings (Ollama)'],
+      ['hidden-critical', 'Critical issues maintainers may have underestimated'],
+      ['triage <n>', 'A consolidated triage audit of one issue (Ollama)'],
+      ['prompt <n>', 'Local answer when context fits; a ready-to-send expert prompt when it does not'],
+      ['inspect <n>', 'What context would be retrieved, and whether prompt would answer locally'],
+      ['guide <n>', 'A step-by-step resolution blueprint from local memory (Ollama)'],
+      ['chat <n>', 'An interactive REPL session, escalating to a cloud model only when you say so'],
+      ['report', 'A consolidated weekly health report'],
+      ['trend', 'Project health metrics tracked over time'],
+    ],
+  },
+  {
+    title: 'Housekeeping',
+    needs: 'nothing',
+    blurb: 'Setup once, check when something misbehaves, and keep what cannot be re-derived.',
+    cmds: [
+      ['setup', 'Interactive wizard for settings, models and paths'],
+      ['doctor', 'Check every prerequisite at once and say exactly what to fix'],
+      ['model', 'The local model that upgrades search from words to meaning'],
+      ['alias', 'Give the command your own name'],
+      ['backup', 'Export the database and memory to a portable archive — keeps the last five'],
+      ['restore', 'Restore from a backup archive without overwriting your credentials'],
+    ],
+  },
+];
+---
+
+<Base
+  title="Command reference — ubuos docs"
+  description="Every oss command, grouped by the question it answers, with what each one needs to run."
+>
+  <section>
+    <p class="pill">Docs · Reference</p>
+    <h1>The commands, grouped by question.</h1>
+    <p class="lede">
+      This is <code>oss --help</code> arranged by what you are trying to find out.
+      For flags, the CLI is the authority: <code>oss &lt;command&gt; --help</code>.
+      Nothing below needs a model unless it says so, and nothing needs more than a
+      GitHub token to start.
+    </p>
+  </section>
+
+  {groups.map((g) => (
+    <section class="tight">
+      <h2>{g.title} <span class="needs">needs: {g.needs}</span></h2>
+      <p class="blurb">{g.blurb}</p>
+      <div class="table-wrap">
+        <table>
+          <tbody>
+            {g.cmds.map(([cmd, what]) => (
+              <tr><td><code>oss {cmd}</code></td><td>{what}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  ))}
+
+  <section class="tight">
+    <p class="note">
+      Global flag worth knowing: <code>-r, --repo owner/name</code> targets a
+      repository explicitly. Commands that take an issue or PR number use the
+      default repository when you leave it off — set it once with <code>oss setup</code>.
+    </p>
+  </section>
+
+  <style>
+    .tight { padding-top: 0; }
+    .needs {
+      font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--muted); font-weight: 400; margin-left: 10px; white-space: nowrap;
+    }
+    .blurb { color: var(--muted); max-width: var(--measure); margin: 4px 0 0; }
+    .table-wrap { margin-top: 14px; overflow-x: auto; border: 1px solid var(--line); border-radius: 9px; background: var(--card); }
+    table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14.5px; }
+    td { padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    td:first-child { white-space: nowrap; }
+    tr:last-child td { border-bottom: 0; }
+    td code { background: none; padding: 0; }
+    .note {
+      max-width: var(--measure); color: var(--muted);
+      border-left: 2px solid var(--accent); padding-left: 14px; margin: 0;
+    }
+  </style>
+</Base>
