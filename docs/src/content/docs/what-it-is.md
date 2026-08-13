@@ -22,7 +22,8 @@ so it can be bash, Python, Go, or a binary somebody handed you.
 | Just `oss` | Facts from the API: diffs, commits, CI, review threads, conventions |
 | + a runner | Execution against real applications |
 | + a memory | Markdown filed by topic, and keyword search over it |
-| + a local model | Verdicts, and search by meaning |
+| + the built-in model | Search by meaning — `oss model --fetch`, 22 MB, in-process |
+| + a local model server | Verdicts, triage and conversation |
 | + a cloud key | Escalation past the local budget |
 
 The storing half needs **no AI whatsoever** — filing, the topic map and the

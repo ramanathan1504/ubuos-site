@@ -204,9 +204,10 @@ oss-cli sync --all
 <span class="c"># review a pull request</span>
 oss-cli review 4234 -r apache/kafka</pre>
       <p class="note">
-        <strong>Optional, any time:</strong> install <a href="https://ollama.com">Ollama</a> for
-        local answers and semantic search, then run <code>oss-cli setup</code> to point it at your
-        own note folders. Skip both and every command above still works.
+        <strong>Optional, any time:</strong> run <code>oss-cli model --fetch</code> for search by
+        meaning, install <a href="https://ollama.com">Ollama</a> for local answers and verdicts,
+        then run <code>oss-cli setup</code> to point it at your own note folders. Skip all three
+        and every command above still works.
       </p>
     </section>
 
@@ -223,7 +224,7 @@ oss-cli review 4234 -r apache/kafka</pre>
             <tr><td><code>onboard</code></td><td class="need">token</td><td>What a project expects before you contribute</td></tr>
             <tr><td><code>review &lt;pr&gt;</code></td><td class="need">token</td><td>Reviews a PR using every source you have connected</td></tr>
             <tr><td><code>prompt &lt;issue&gt;</code></td><td class="need">token</td><td>Answers locally, or builds an expert prompt when it cannot</td></tr>
-            <tr><td><code>search &lt;query&gt;</code></td><td class="need">Ollama</td><td>Semantic search across everything indexed</td></tr>
+            <tr><td><code>search &lt;query&gt;</code></td><td class="need">—</td><td>Searches everything indexed — by meaning with the built-in model, by shared terms without it</td></tr>
             <tr><td><code>triage &lt;issue&gt;</code></td><td class="need">Ollama</td><td>Full triage audit for one issue</td></tr>
             <tr><td><code>doctor</code></td><td class="need">—</td><td>Checks every prerequisite and says what to fix</td></tr>
           </tbody>
@@ -281,7 +282,7 @@ oss-cli review 4234 --refresh        <span class="c"># ignore the cache</span></
           <tbody>
             <tr><td><code>default.repository</code></td><td>Used when <code>-r</code> is omitted</td></tr>
             <tr><td><code>drive.paths</code></td><td>Folders holding your notes, comma separated</td></tr>
-            <tr><td><code>ollama.model.embedding</code></td><td>Model for the vector index</td></tr>
+            <tr><td><code>ollama.url</code></td><td>Where the daemon is, if it is not on this machine</td></tr>
             <tr><td><code>ollama.model.guidance</code></td><td>Model for answers and verdicts</td></tr>
             <tr><td><code>ollama.context_limit</code></td><td>Tokens before escalation</td></tr>
           </tbody>
@@ -300,15 +301,30 @@ oss-cli review 4234 --refresh        <span class="c"># ignore the cache</span></
 <pre>security add-generic-password -a "$USER" -s github_token -w "$(gh auth token)" -U</pre>
 
       <h3>Cannot reach the Ollama daemon</h3>
-      <p>Ollama is not running. Start it — installing a model cannot fix a stopped server:</p>
-<pre>ollama serve</pre>
-
-      <h3>Issues sync but search finds nothing</h3>
       <p>
-        The vector index is built during <code>sync</code> and needs Ollama. If it was not
-        running, the issues were saved without vectors. Start Ollama and sync again — indexing
-        is incremental, so only the missing ones are built.
+        Ollama is not running. Start it — installing a model cannot fix a stopped server. This
+        affects verdicts, triage, <code>guide</code> and <code>chat</code> only; search and
+        <code>duplicates</code> never call it:
       </p>
+<pre>ollama serve</pre>
+      <p>
+        If it runs on another machine, point at it instead of starting one here:
+      </p>
+<pre>oss-cli setup     <span class="c"># or set ollama.url directly</span></pre>
+
+      <h3>Search finds things, but not by meaning</h3>
+      <p>
+        The built-in model is not on disk. It is never downloaded on its own, so search fell
+        back to ranking by shared terms and said so. Fetch it once — about 22 MB, into
+        <code>~/.oss-cli/models</code>:
+      </p>
+<pre>oss-cli model --fetch</pre>
+      <p>
+        Then sync once more so the issues already on disk get vectors. Indexing is incremental,
+        so only the missing ones are built, and embedding runs inside this process — there is no
+        daemon to keep alive for it:
+      </p>
+<pre>oss-cli sync --all</pre>
     </section>
   </main>
 </div>
