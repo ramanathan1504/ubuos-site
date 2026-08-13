@@ -67,20 +67,19 @@ from the GitHub API alone:
 | Running 19 applications across a version × config matrix | | ✅ 65 MB of real apps — that is a repository, not a command |
 
 Follow-up is the clearest case, because it used to be on the wrong side. It
-lived inside a Log4j bench, where it worked against any repository but could
-only be reached by attaching that bench — a general capability held hostage by a
+lived inside a runner, where it worked against any repository but could only be
+reached by attaching that runner — a general capability held hostage by a
 specific one. It needs one API read and a record; it forks no JVM. So it moved.
 
 ## A pack, worked through
 
-[**log4j2-workout**](https://github.com/ramanathan1504/log4j2-workout) is a real
-runner: Apache Log4j against nineteen applications, on real JVMs, across a
-version × configuration × application matrix. It is the example to copy, and
-**you never need to clone it** to use `oss`.
+A real runner puts one project through nineteen applications, on real JVMs,
+across a version × configuration × application matrix. **You never need one to
+use `oss`** — the engine ships here, and a runner only supplies what to run.
 
 The part worth stealing is how it separates the engine from what it tests. The
-engine forks JVMs and walks a matrix; none of that is Log4j-specific. What *is*
-lives in one file:
+engine forks JVMs and walks a matrix; none of that knows what it is testing.
+What *is* specific lives in one file:
 
 ```bash
 BENCH_PACK=example ./bench list      # packs/example/ exists to be copied

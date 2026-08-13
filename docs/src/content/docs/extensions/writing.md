@@ -105,10 +105,10 @@ unusable with nothing explaining why. That exact bug shipped once.
 
 ## A worked example you can read
 
-[**log4j2-workout**](https://github.com/ramanathan1504/log4j2-workout) used to
-be the worked example here — until it stopped being an extension at all. It is
-now a **pack**: a `pack.sh` at the root, nineteen applications, and no
-`oss-ext.json`, driven by the engine that ships inside `oss`.
+The worked example here used to be a runner extension — until it stopped being
+an extension at all. It is now a **pack**: a `pack.sh` at the root, nineteen
+applications, and no `oss-ext.json`, driven by the engine that ships inside
+`oss`.
 
 That is the fate of most things that start as a runner extension, and it is a
 good fate. If your repository exists to be *run across versions and configs*,
