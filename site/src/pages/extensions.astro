@@ -33,7 +33,7 @@ const extensions = (await getCollection('extensions')).sort((a, b) => a.data.ord
           <h3>{e.data.name} <span class="pill">{e.data.kind}</span></h3>
           <p>{e.data.summary}</p>
           <pre class="mini"><code>{e.data.attach}</code></pre>
-          {e.data.repo && <p class="more"><a href={e.data.repo}>Source →</a></p>}
+          {e.data.repo && <p class="more"><a href={e.data.repo} target="_blank" rel="noopener">Source →</a></p>}
         </article>
       ))}
     </div>

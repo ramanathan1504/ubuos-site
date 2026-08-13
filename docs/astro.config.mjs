@@ -35,9 +35,18 @@ export default defineConfig({
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/ramanathan1504/oss-cli' },
       ],
-      editLink: {
-        baseUrl: 'https://github.com/ramanathan1504/ubuos-site/edit/main/docs/',
-      },
+      // No editLink: configuring one puts an "Edit page" button on every page,
+      // which for a reader is a jump out of the manual into repository source.
+      // Contributors find the source through the GitHub link.
+      head: [
+        {
+          // Links that leave ubuos.com open in a new tab; the manual stays put.
+          // Starlight has no per-link control for this, so it is one script.
+          tag: 'script',
+          content:
+            "document.addEventListener('DOMContentLoaded',function(){for(var a of document.querySelectorAll('a[href^=\"http\"]')){if(a.hostname!==location.hostname){a.target='_blank';a.rel='noopener'}}});",
+        },
+      ],
       sidebar: [
         {
           label: 'Start here',
