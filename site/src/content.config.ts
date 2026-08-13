@@ -23,6 +23,10 @@ const tools = defineCollection({
     summary: z.string(),
     install: z.string().optional(),
     repo: z.string().url().optional(),
+    // Where someone can actually try it. Separate from repo, because source and
+    // a running page answer different questions, and a catalogue that offers only
+    // the source sends every visitor to a README.
+    site: z.string().url().optional(),
     // Lower sorts first. Explicit, because "the order files happen to load in"
     // is not an editorial decision.
     order: z.number().default(50),

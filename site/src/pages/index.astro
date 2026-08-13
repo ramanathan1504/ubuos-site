@@ -63,9 +63,18 @@ wsl oss run …                             # packs run under WSL</code></pre>
           <p class="tagline">{t.data.tagline}</p>
           <p>{t.data.summary}</p>
           {t.data.install && <pre class="mini"><code>{t.data.install}</code></pre>}
-          {t.data.repo && (
-            <p class="more"><a href={t.data.repo} target="_blank" rel="noopener">Source →</a></p>
-          )}
+          <p class="more">
+            {/* The tool's own page first: it is the one a reader can try, and the
+                catalogue previously offered only the source, so the site nobody
+                linked to was the site nobody found. */}
+            {t.data.site && (
+              <a href={t.data.site} target="_blank" rel="noopener">Try it →</a>
+            )}
+            {t.data.site && t.data.repo && <span class="dim"> · </span>}
+            {t.data.repo && (
+              <a href={t.data.repo} target="_blank" rel="noopener">Source →</a>
+            )}
+          </p>
         </article>
       ))}
     </div>
