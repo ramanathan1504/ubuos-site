@@ -151,7 +151,7 @@ td.need{font-family:var(--mono);font-size:.8rem;color:var(--ink-faint)}
       <h2>Install</h2>
 
       <h3>macOS</h3>
-<pre>brew install ramanathan1504/oss-cli/oss-cli</pre>
+<pre>brew install ramanathan1504/oss-cli/oss</pre>
       <p>Homebrew pulls in OpenJDK 17 and puts <code>oss-cli</code> on your PATH.</p>
 
       <h3>Linux</h3>
@@ -190,23 +190,23 @@ security add-generic-password -a "$USER" -s github_token -w "$(gh auth token)" -
 <span class="c"># Linux / Windows</span>
 export GITHUB_TOKEN="ghp_your_token_here"</pre>
       <p>Then check everything at once:</p>
-<pre>oss-cli doctor</pre>
+<pre>oss doctor</pre>
     </section>
 
     <section id="first-run">
       <h2>First run</h2>
 <pre><span class="c"># register any repository you want to follow</span>
-oss-cli sync --add apache/kafka
+oss sync --add apache/kafka
 
 <span class="c"># pull issues and PRs, then build the search index</span>
-oss-cli sync --all
+oss sync --all
 
 <span class="c"># review a pull request</span>
-oss-cli review 4234 -r apache/kafka</pre>
+oss review 4234 -r apache/kafka</pre>
       <p class="note">
-        <strong>Optional, any time:</strong> run <code>oss-cli model --fetch</code> for search by
+        <strong>Optional, any time:</strong> run <code>oss model --fetch</code> for search by
         meaning, install <a href="https://ollama.com">Ollama</a> for local answers and verdicts,
-        then run <code>oss-cli setup</code> to point it at your own note folders. Skip all three
+        then run <code>oss setup</code> to point it at your own note folders. Skip all three
         and every command above still works.
       </p>
     </section>
@@ -235,7 +235,7 @@ oss-cli review 4234 -r apache/kafka</pre>
 
     <section id="review">
       <h2>Reviewing a pull request</h2>
-<pre>oss-cli review 4234</pre>
+<pre>oss review 4234</pre>
       <p>
         Built as a ladder. Each layer is optional and additive, and the output states which
         were <strong>actually used</strong> — so a thin review is never mistaken for a clean one.
@@ -257,14 +257,14 @@ oss-cli review 4234 -r apache/kafka</pre>
         pull request, so re-reviewing unchanged code is instant while a new push re-fetches on
         its own. No local clone is needed.
       </p>
-<pre>oss-cli review 4234 --no-verdict     <span class="c"># facts and conventions only</span>
-oss-cli review 4234 --escalate       <span class="c"># send large diffs to a cloud model</span>
-oss-cli review 4234 --refresh        <span class="c"># ignore the cache</span></pre>
+<pre>oss review 4234 --no-verdict     <span class="c"># facts and conventions only</span>
+oss review 4234 --escalate       <span class="c"># send large diffs to a cloud model</span>
+oss review 4234 --refresh        <span class="c"># ignore the cache</span></pre>
     </section>
 
     <section id="onboard">
       <h2>Joining a project</h2>
-<pre>oss-cli onboard -r apache/logging-log4j2</pre>
+<pre>oss onboard -r apache/logging-log4j2</pre>
       <p>
         The same profile <code>review</code> judges against, read from the other direction:
         what to target <em>before</em> writing anything. Reports rules as instructions rather
@@ -275,7 +275,7 @@ oss-cli review 4234 --refresh        <span class="c"># ignore the cache</span></
 
     <section id="config">
       <h2>Configuration</h2>
-      <p>Settings live in SQLite, not a dotfile. <code>oss-cli setup</code> writes them.</p>
+      <p>Settings live in SQLite, not a dotfile. <code>oss setup</code> writes them.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Key</th><th>Meaning</th></tr></thead>
@@ -294,7 +294,7 @@ oss-cli review 4234 --refresh        <span class="c"># ignore the cache</span></
     <section id="trouble">
       <h2>Troubleshooting</h2>
       <p>Start here — it checks every prerequisite and names what to fix:</p>
-<pre>oss-cli doctor</pre>
+<pre>oss doctor</pre>
 
       <h3>GitHub rejected the token</h3>
       <p>The stored token expired or was revoked. Create a new one and register it:</p>
@@ -310,7 +310,7 @@ oss-cli review 4234 --refresh        <span class="c"># ignore the cache</span></
       <p>
         If it runs on another machine, point at it instead of starting one here:
       </p>
-<pre>oss-cli setup     <span class="c"># or set ollama.url directly</span></pre>
+<pre>oss setup     <span class="c"># or set ollama.url directly</span></pre>
 
       <h3>Search finds things, but not by meaning</h3>
       <p>
@@ -318,13 +318,13 @@ oss-cli review 4234 --refresh        <span class="c"># ignore the cache</span></
         back to ranking by shared terms and said so. Fetch it once — about 22 MB, into
         <code>~/.oss-cli/models</code>:
       </p>
-<pre>oss-cli model --fetch</pre>
+<pre>oss model --fetch</pre>
       <p>
         Then sync once more so the issues already on disk get vectors. Indexing is incremental,
         so only the missing ones are built, and embedding runs inside this process — there is no
         daemon to keep alive for it:
       </p>
-<pre>oss-cli sync --all</pre>
+<pre>oss sync --all</pre>
     </section>
   </main>
 </div>
