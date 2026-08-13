@@ -22,7 +22,7 @@ exists only in the belief that it exists.
    Approval is per invocation and never remembered.
 
 ```bash
-oss run --approve-upstream apache/logging-log4j2 hub --pr 4234
+oss run --approve-upstream owner/name hub --pr 4234
 ```
 
 ## It binds every path equally

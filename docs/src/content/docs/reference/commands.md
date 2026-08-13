@@ -58,7 +58,7 @@ report, not a failure.
 the author pushed after you commented — it has nothing to compare against.
 
 ```bash
-oss followup --record 4234 --repo apache/logging-log4j2 --verdict blocked \
+oss followup --record 4234 --repo owner/name --verdict blocked \
              --note "compressionLevel=0 throws in the rollover"
 oss followup                 # every recorded PR, one line each
 oss followup --changed       # only the ones that moved

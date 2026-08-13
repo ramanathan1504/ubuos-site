@@ -196,13 +196,13 @@ export GITHUB_TOKEN="ghp_your_token_here"</pre>
     <section id="first-run">
       <h2>First run</h2>
 <pre><span class="c"># register any repository you want to follow</span>
-oss sync --add apache/kafka
+oss sync --add owner/name
 
 <span class="c"># pull issues and PRs, then build the search index</span>
 oss sync --all
 
 <span class="c"># review a pull request</span>
-oss review 4234 -r apache/kafka</pre>
+oss review 4234 -r owner/name</pre>
       <p class="note">
         <strong>Optional, any time:</strong> run <code>oss model --fetch</code> for search by
         meaning, install <a href="https://ollama.com">Ollama</a> for local answers and verdicts,
@@ -264,7 +264,7 @@ oss review 4234 --refresh        <span class="c"># ignore the cache</span></pre>
 
     <section id="onboard">
       <h2>Joining a project</h2>
-<pre>oss onboard -r apache/logging-log4j2</pre>
+<pre>oss onboard -r owner/name</pre>
       <p>
         The same profile <code>review</code> judges against, read from the other direction:
         what to target <em>before</em> writing anything. Reports rules as instructions rather

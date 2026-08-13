@@ -14,8 +14,8 @@ A fresh install has no extensions attached, and everything below already works:
 
 ```bash
 oss search "rollover compression"    # your own data, no model needed
-oss issue 4143 --repo apache/logging-log4j2
-oss pr 4240 --repo apache/logging-log4j2
+oss issue 4143 --repo owner/name
+oss pr 4240 --repo owner/name
 oss review 4240
 oss followup                         # what moved on what you reviewed
 oss hub                              # is anyone waiting on you
