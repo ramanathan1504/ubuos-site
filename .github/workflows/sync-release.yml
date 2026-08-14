@@ -108,7 +108,14 @@ jobs:
           git commit -aqm "docs: sync changelog to ${{ steps.rel.outputs.latest }}"
           git push -q -f origin "$branch"
 
-          if gh pr view "$branch" --json number >/dev/null 2>&1; then
+          # --state open, because `gh pr view <branch>` matches a MERGED pull request
+          # as readily as an open one. The branch name is derived from the version, so
+          # a re-run after that version's pull request was merged pushed the new
+          # content, found the merged one, announced "already open" and opened nothing
+          # -- leaving a corrected changelog on a branch nobody would look at while the
+          # run reported success. Which is exactly what happened to 1.11.8.
+          open_prs=$(gh pr list --head "$branch" --state open --json number --jq 'length')
+          if [ "$open_prs" -gt 0 ]; then
             echo "pull request already open for $branch"
           else
             gh pr create --base main --head "$branch" \
