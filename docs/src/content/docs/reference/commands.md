@@ -11,6 +11,8 @@ description: What each command is for.
 |---|---|
 | `review <n>` | Is this pull request right, against what the project actually expects |
 | `search <words>` | Have I seen this before |
+| `chat <n>` | Work through one issue in conversation, saved as you go |
+| `history` | Which conversations do I have, and where did each get to |
 | `inspect <n>` | What context sits behind one result |
 | `critical` | What arrived that matters most |
 | `duplicates` | Is this the same as something already open |

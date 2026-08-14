@@ -56,6 +56,7 @@ export default defineConfig({
             { label: 'How it fits together', slug: 'how-it-fits' },
             { label: 'Connect your project', slug: 'connect' },
             { label: 'Finding things', slug: 'search' },
+            { label: 'Conversations', slug: 'conversations' },
           ],
         },
         {
