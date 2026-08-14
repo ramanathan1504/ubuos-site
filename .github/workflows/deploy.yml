@@ -1,9 +1,15 @@
-# Build both sites and publish each to its own Cloudflare Pages project.
+# Build the site and publish it to one Cloudflare Pages project.
 #
-# There are two sites in this repository and they are not the same thing:
+# One domain, three parts of one site:
 #
-#   site/  -> ubuos.com        the catalogue: what these tools are
-#   docs/  -> docs.ubuos.com   the manual
+#   site/          -> ubuos.com          the catalogue: what these tools are
+#   docs/          -> ubuos.com/docs     the manual
+#   oss-cli site/  -> ubuos.com/osscli   the product page, folded in from the
+#                                        other repository at build time
+#
+# docs used to be its own host and the landing page used to be its own Pages
+# project. Both were folded in for the same reason: a second host is a second
+# thing to remember, certificate, and find broken later.
 #
 # Deployed from here rather than by connecting Pages to Git, because a Pages Git
 # integration reads its build settings from a dashboard -- so the command that
@@ -19,6 +25,11 @@ name: Deploy
 on:
   push:
     branches: [main]
+  # Polled, because the landing page folded in below lives in another repository
+  # and a push from there would need a cross-repo credential. Same trade as
+  # sync-release.yml: a few hours of staleness against a secret that cannot lapse.
+  schedule:
+    - cron: "41 */6 * * *"
   workflow_dispatch:
 
 concurrency:
@@ -69,6 +80,29 @@ jobs:
           mkdir -p site/dist/docs
           cp -R docs/dist/* site/dist/docs/
 
+      # Same reasoning as the manual above: one project, one domain, and the
+      # product page is part of the site rather than a separate host to remember.
+      # Checked out rather than pushed from the other repository -- oss-cli is
+      # public, so this needs no credential, and no credential is one that cannot
+      # expire. The lesson from the Homebrew tap, which shipped two releases
+      # pointing at the wrong jar because a cross-repo token had lapsed.
+      - name: Fetch the oss-cli landing page
+        uses: actions/checkout@v4
+        with:
+          repository: ramanathan1504/oss-cli
+          ref: main
+          path: .osscli
+
+      - name: Fold it into site/dist/osscli
+        run: |
+          set -euo pipefail
+          mkdir -p site/dist/osscli
+          # index.html only. _headers is honoured at the root of a Pages project
+          # and nowhere else, so copying it into a subdirectory would look like a
+          # policy that is silently not applied; README.md is source, not output.
+          cp .osscli/site/index.html site/dist/osscli/index.html
+          echo "landing page folded in ($(wc -c < site/dist/osscli/index.html) bytes)"
+
       - name: Check something was actually produced
         working-directory: site
         # A build that succeeds and emits nothing would deploy an empty site over
@@ -76,6 +110,7 @@ jobs:
         run: |
           test -f dist/index.html      || { echo "no dist/index.html"; exit 1; }
           test -f dist/docs/index.html || { echo "docs missing from dist/docs"; exit 1; }
+          test -f dist/osscli/index.html || { echo "landing page missing from dist/osscli"; exit 1; }
           echo "$(find dist -name '*.html' | wc -l) page(s) built, docs included"
 
       - name: Create the Pages project if it does not exist
