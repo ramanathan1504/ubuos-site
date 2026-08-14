@@ -252,6 +252,7 @@ td.need{font-family:var(--mono);font-size:.8rem;color:var(--ink-faint)}
         <li><a href="#commands">Commands</a></li>
         <li><a href="#review">Reviewing a PR</a></li>
         <li><a href="#onboard">Joining a project</a></li>
+        <li><a href="#resume">Picking a conversation back up</a></li>
         <li><a href="#config">Configuration</a></li>
         <li><a href="#trouble">Troubleshooting</a></li>
       </ol>
@@ -344,6 +345,8 @@ oss review 4234 -r owner/name</pre>
             <tr><td><code>prompt &lt;issue&gt;</code></td><td class="need">token</td><td>Answers locally, or builds an expert prompt when it cannot</td></tr>
             <tr><td><code>search &lt;query&gt;</code></td><td class="need">—</td><td>Searches everything indexed — by meaning with the built-in model, by shared terms without it</td></tr>
             <tr><td><code>triage &lt;issue&gt;</code></td><td class="need">Ollama</td><td>Full triage audit for one issue</td></tr>
+            <tr><td><code>chat &lt;issue&gt;</code></td><td class="need">Ollama <em>or</em> a key</td><td>A conversation about one issue, saved as you go</td></tr>
+            <tr><td><code>history</code></td><td class="need">—</td><td>Browse saved conversations and pick one up again</td></tr>
             <tr><td><code>doctor</code></td><td class="need">—</td><td>Checks every prerequisite and says what to fix</td></tr>
           </tbody>
         </table>
@@ -391,6 +394,34 @@ oss review 4234 --refresh        <span class="c"># ignore the cache</span></pre>
       </p>
     </section>
 
+    <section id="resume">
+      <h2>Picking a conversation back up</h2>
+<pre>oss chat 4129        # start on an issue
+oss chat --continue  # carry on with the most recent
+oss history          # browse them all, and resume the one you pick</pre>
+      <p>
+        Every turn is written the moment it is said, so closing the terminal is a pause
+        rather than a loss &mdash; and <kbd>ctrl-c</kbd> costs nothing. <code>oss history</code>
+        is a list you move through with the arrow keys, with a preview of what each
+        conversation was about and where it got to; <kbd>enter</kbd> resumes the highlighted one.
+        Without a real terminal the same list is numbered instead, so it still works over a
+        remote shell or on Windows.
+      </p>
+      <p>
+        A long conversation is <strong>folded, not truncated</strong>: older turns are
+        summarised and the recent ones kept verbatim, and the full transcript stays readable
+        in <code>oss history --show</code> either way. Two things you can type that are not
+        questions &mdash; <code>/context</code> draws how full the conversation is, and
+        <code>/compact</code> folds it now rather than waiting for it to happen mid&#8209;answer.
+        Neither becomes a turn.
+      </p>
+      <p>
+        Several terminals can run at once. Each conversation is claimed by the terminal
+        holding it, and a second one that opens the same conversation forks a copy rather than
+        interleaving two people into one transcript.
+      </p>
+    </section>
+
     <section id="config">
       <h2>Configuration</h2>
       <p>Settings live in SQLite, not a dotfile. <code>oss setup</code> writes them.</p>
@@ -403,6 +434,8 @@ oss review 4234 --refresh        <span class="c"># ignore the cache</span></pre>
             <tr><td><code>ollama.url</code></td><td>Where the daemon is, if it is not on this machine</td></tr>
             <tr><td><code>ollama.model.guidance</code></td><td>Model for answers and verdicts</td></tr>
             <tr><td><code>ollama.context_limit</code></td><td>Tokens before escalation</td></tr>
+            <tr><td><code>ollama.timeout_seconds</code></td><td>How long to wait for a local answer (default 900)</td></tr>
+            <tr><td><code>chat.context.chars</code></td><td>The whole prompt budget for <code>chat</code>, transcript and retrieved notes together (default 32,000)</td></tr>
           </tbody>
         </table>
       </div>
