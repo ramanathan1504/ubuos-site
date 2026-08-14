@@ -38,6 +38,37 @@ description: What each command is for.
 | `run <verb> …` | Dispatch to a runner |
 | `memory <verb> …` | Dispatch to a memory |
 
+## When something goes wrong
+
+The console shows what you need while you work. The full record is on disk:
+
+```
+~/.oss-cli/logs/oss-cli.log
+```
+
+Everything the console printed, plus `DEBUG` — the calls that were made, the
+values that were read, the reason a step was skipped. When a command did
+something you did not expect, that file says why and the screen usually does
+not.
+
+| | |
+|---|---|
+| Level | `DEBUG` on disk, `INFO` on screen |
+| Rolls at | 10 MB, or daily |
+| Keeps | 10 files, gzipped |
+
+`oss doctor` is the first thing to run; the log is the second.
+
+:::note
+Writes to that file happen on a background thread, so logging never sits between
+you and an answer. It is flushed when the command exits, so the last line of a
+run is always there — including the last line of a run that failed.
+
+The console is deliberately **not** written that way. In this program the
+console output *is* the interface, and an interface that arrives a moment late
+lands after the prompt you are already typing into.
+:::
+
 ## Setup
 
 | Command | Does |
