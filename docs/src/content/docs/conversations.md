@@ -64,13 +64,57 @@ Turns stay private to their conversation while it is open. On `exit` the
 transcript is filed and embedded, and from then on every terminal's `search`,
 `prompt` and `review` can retrieve it.
 
+## A model that does not fit is not loaded
+
+Ollama does not refuse a model larger than the free memory. It loads it, the
+machine swaps, and everything stops responding for minutes — measured at ten on
+an 8 GB laptop running a 7B model with a browser open. That is worse than an
+error: an error can be read, and a frozen laptop cannot even be cancelled.
+
+So the size is checked against what is actually free, before anything loads.
+
+- **At most half the free memory** is offered to a model. The other half is left
+  for everything else you are running — fitting the model in and making the rest
+  of the desktop unusable is the same freeze from where you sit.
+- When it does not fit, the largest installed model that **would** is named.
+  "Too big" is a complaint; "too big, use this one" is an instruction.
+- `chat` falls back to whatever else is connected. `guide` says which cloud flag
+  to pass instead.
+
+```
+⚠ Not running 'qwen2.5-coder:7b' locally — it does not fit in memory right now.
+  'qwen2.5-coder:7b' needs about 5.4 GB and this machine has 1.9 GB free of 8.6 GB.
+  Loading it would swap, and swapping locks the machine up for minutes rather than failing.
+    At most half the free memory is used, so 1.0 GB is available to a model
+    and 1.0 GB is left for everything else you are running.
+    'qwen2.5:0.5b' is installed and fits. Set it with: oss setup
+```
+
+`oss doctor` reports it in advance, so the first you hear of it is not a
+stalled machine:
+
+```
+[ warn ] guidance model — qwen3:4b does not fit in memory right now
+[  ok  ] triage model — qwen2.5:0.5b — fits (1.5 GB free of 8.6 GB)
+```
+
+Because only half of what is free is ever used, a model needs roughly **twice
+its own size free** to run. Nothing has to be reconfigured when memory frees up
+— the check is taken each time, so the same model starts working again on its
+own.
+
+:::note
+A machine whose memory cannot be read is never refused on. The check exists to
+prevent a freeze, and refusing on no evidence would be its own kind of broken.
+:::
+
 ## Settings
 
 | Key | Meaning |
 |---|---|
 | `chat.context.chars` | The whole prompt budget — transcript and retrieved notes together. Default 32,000, roughly an 8k-token window |
 | `ollama.timeout_seconds` | How long to wait for a local answer. Default 900 |
-| `ollama.model.guidance` | The model that answers |
+| `ollama.model.guidance` | The model that answers. Pick one that fits — see above |
 
 :::caution
 A 7B model on an Apple-silicon laptop was measured at **482 seconds** for a
