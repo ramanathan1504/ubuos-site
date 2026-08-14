@@ -1,0 +1,93 @@
+# Retire the osscli Pages project.
+#
+# The landing page moved to ubuos.com/osscli, folded into this site's build the
+# way the manual was when docs.ubuos.com went. What is left behind is a second
+# Cloudflare project still serving a copy at osscli.pages.dev -- and a stale copy
+# that still answers is worse than none: search engines keep it, and the version
+# somebody lands on is the one nobody is updating.
+#
+# Requires typing the project name to run, because deleting a Pages project has
+# no undo. A dispatch button next to "deploy" is too easy to press by accident.
+name: Retire osscli project
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type the project name to retire (osscli)'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  retire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CF_API: https://api.cloudflare.com/client/v4
+      TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      PROJECT: osscli
+      REPLACEMENT: https://ubuos.com/osscli/
+    steps:
+      - name: Check the confirmation matches
+        run: |
+          set -euo pipefail
+          [ "${{ inputs.confirm }}" = "$PROJECT" ] || {
+            echo "::error::type $PROJECT exactly to confirm — nothing was changed"; exit 1; }
+          [ -n "$TOKEN" ] || { echo "::error::CLOUDFLARE_API_TOKEN is not set"; exit 1; }
+          [ -n "$ACCOUNT" ] || { echo "::error::CLOUDFLARE_ACCOUNT_ID is not set"; exit 1; }
+
+      - name: Refuse unless the replacement is already serving the page
+        run: |
+          set -euo pipefail
+          # The whole point of retiring this is that the page lives somewhere
+          # else now. If it does not, deleting the project deletes the only copy
+          # -- so this checks the replacement by its TITLE, not its status code.
+          # A catch-all route answers 200 for anything, which is exactly how the
+          # broken /osscli route looked healthy for as long as it did.
+          body=$(curl -sS -L --max-time 20 "$REPLACEMENT")
+          echo "$body" | grep -qi '<title>OSS-CLI' || {
+            echo "::error::$REPLACEMENT is not serving the landing page — refusing to delete the only copy"
+            echo "$body" | grep -oiE '<title>[^<]*' | head -1
+            exit 1; }
+          echo "  $REPLACEMENT serves the landing page — safe to retire"
+
+      - name: Detach any custom domains
+        run: |
+          set -euo pipefail
+          # Detach before deleting: a project removed while still holding a
+          # hostname can leave the hostname pointing at nothing verifiable, which
+          # produces a certificate error rather than a clean 404.
+          hosts=$(curl -sS "$CF_API/accounts/$ACCOUNT/pages/projects/$PROJECT/domains" \
+                  -H "Authorization: Bearer $TOKEN" | jq -r '.result[]?.name // empty')
+          if [ -z "$hosts" ]; then
+            echo "  no custom domains attached"
+          else
+            for h in $hosts; do
+              curl -sS -X DELETE "$CF_API/accounts/$ACCOUNT/pages/projects/$PROJECT/domains/$h" \
+                -H "Authorization: Bearer $TOKEN" \
+                | jq -r '"  detached '"$h"': " + (.success|tostring)'
+            done
+          fi
+
+      - name: Delete the Pages project
+        run: |
+          set -euo pipefail
+          resp=$(curl -sS -X DELETE "$CF_API/accounts/$ACCOUNT/pages/projects/$PROJECT" \
+                 -H "Authorization: Bearer $TOKEN")
+          echo "$resp" | jq -r 'if .success then "  deleted project '"$PROJECT"'" else ("  " + (.errors[]?.message // "already gone")) end'
+
+      - name: Confirm the old URL is gone and the new one is not
+        run: |
+          set -euo pipefail
+          old=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "https://$PROJECT.pages.dev" || true)
+          new=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "$REPLACEMENT" || true)
+          echo "  https://$PROJECT.pages.dev -> $old"
+          echo "  $REPLACEMENT -> $new"
+          [ "$new" = "200" ] || { echo "::error::the replacement stopped answering"; exit 1; }
+          case "$old" in
+            200) echo "::warning::$PROJECT.pages.dev still answers — deletion can lag; re-check shortly." ;;
+            *)   echo "  retired" ;;
+          esac
