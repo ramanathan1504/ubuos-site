@@ -48,11 +48,19 @@ jobs:
           # A catch-all route answers 200 for anything, which is exactly how the
           # broken /osscli route looked healthy for as long as it did.
           body=$(curl -sS -L --max-time 20 "$REPLACEMENT")
-          echo "$body" | grep -qi '<title>OSS-CLI' || {
-            echo "::error::$REPLACEMENT is not serving the landing page — refusing to delete the only copy"
-            echo "$body" | grep -oiE '<title>[^<]*' | head -1
-            exit 1; }
-          echo "  $REPLACEMENT serves the landing page — safe to retire"
+          # Matched with `case`, not `echo | grep -q`. Under `set -o pipefail`
+          # grep -q exits on the first match, echo takes SIGPIPE, and the
+          # pipeline reports failure -- so a page that DID match was reported as
+          # not matching. This guard refused a correct retirement exactly once
+          # that way. Failing safe was right; being wrong about why was not.
+          case "$body" in
+            *"<title>OSS-CLI"*)
+              echo "  $REPLACEMENT serves the landing page — safe to retire" ;;
+            *)
+              echo "::error::$REPLACEMENT is not serving the landing page — refusing to delete the only copy"
+              printf '%s' "$body" | head -c 300
+              exit 1 ;;
+          esac
 
       - name: Detach any custom domains
         run: |
