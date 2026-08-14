@@ -68,8 +68,20 @@ jobs:
             echo
             echo "Current release: **${{ steps.rel.outputs.latest }}**."
             echo
+            # The release body already opens with its own _YYYY-MM-DD_ line, because
+            # that is how release.sh writes notes. Prepending another one printed the
+            # date twice with an empty block between, on every entry since 1.11.4.
+            #
+            # Stripped from the body rather than dropped from the heading: the heading
+            # date is publishedAt, which is a fact about the release, while the body is
+            # whatever a human wrote and may not carry a date at all. The leading \s* is
+            # not optional -- the bodies begin with a newline, so anchoring at ^_ matched
+            # nothing and the first attempt at this fix silently changed no output.
             jq -r '.[] | "## " + (.tag | ltrimstr("v")) + "\n\n_" + (.at | split("T")[0]) + "_\n\n"
-                        + ((.body // "") | gsub("\r"; "") ) + "\n"' releases.json
+                        + ((.body // "")
+                           | gsub("\r"; "")
+                           | sub("^\\s*_[0-9]{4}-[0-9]{2}-[0-9]{2}_\\s+"; "")
+                           | sub("\\s+$"; "")) + "\n"' releases.json
           } > "$out"
           rm -f releases.json
           echo "$(grep -c '^## ' "$out") release(s) written"
