@@ -12,42 +12,21 @@ Current release: **1.11.8**.
 
 _2026-08-14_
 
-
-_2026-08-14_
-
 - Take file logging off the caller's thread, and only file logging (#89)
-
-
-
 
 ## 1.11.7
 
 _2026-08-14_
 
-
-_2026-08-14_
-
 - Stop reporting an extension's own flags as files it could not file (#87)
-
-
-
 
 ## 1.11.6
 
 _2026-08-14_
 
-
-_2026-08-14_
-
 - Do not load a model the machine cannot hold (#85)
 
-
-
-
 ## 1.11.5
-
-_2026-08-14_
-
 
 _2026-08-14_
 
@@ -55,75 +34,39 @@ _2026-08-14_
 - Stop publishing the page from here; ubuos.com serves it (#82)
 - The Docs link went to a page that is not the docs (#81)
 
-
-
-
 ## 1.11.4
-
-_2026-08-14_
-
 
 _2026-08-14_
 
 - Compaction you can ask for, a page that shows its own numbers, and three gaps that stopped it working (#79)
 
-
-
-
 ## 1.11.3
-
-_2026-08-14_
-
 
 _2026-08-14_
 
 - A rejected key was sent three times before anyone was told why (#77)
 
-
-
-
 ## 1.11.2
-
-_2026-08-14_
-
 
 _2026-08-14_
 
 - Chat was gated on Ollama, on a tool whose rule is that nothing is (#75)
 - Nobody could answer "does this work on a plane?" (#74)
 
-
-
-
 ## 1.11.1
-
-_2026-08-14_
-
 
 _2026-08-14_
 
 - An older build read a store it could not understand, in silence (#72)
 
-
-
-
 ## 1.11.0
-
-_2026-08-14_
-
 
 _2026-08-14_
 
 - A conversation that lived in one terminal's memory (#70)
 - Write down what only gets learned by getting it wrong (#69)
 
-
-
-
 ## 1.10.1
-
-_2026-08-13_
-
 
 _2026-08-13_
 
@@ -132,13 +75,7 @@ _2026-08-13_
 - The test isolation did nothing, and the test deleted a real database (#65)
 - There are unit tests now, and CI already runs them (#64)
 
-
-
-
 ## 1.10.0
-
-_2026-08-13_
-
 
 _2026-08-13_
 
@@ -152,39 +89,21 @@ _2026-08-13_
 - Describe the roles, not the one project that fills them (#55)
 - Examples name a placeholder, not somebody else's project (#54)
 
-
-
-
 ## 1.9.1
-
-_2026-08-13_
-
 
 _2026-08-13_
 
 - One unreadable file stopped indexing the rest of its folder (#52)
 - Call it oss in the docs, starting with the install command that fails (#51)
 
-
-
-
 ## 1.9.0
-
-_2026-08-13_
-
 
 _2026-08-13_
 
 - One embedder, in this process, and Ollama only for what it writes (#49)
 - release.sh: wait for checks to exist before watching them (#48)
 
-
-
-
 ## 1.8.3
-
-_2026-08-13_
-
 
 _2026-08-13_
 
@@ -195,20 +114,11 @@ _2026-08-13_
 - ci: bump actions/checkout from 4 to 7 (#15)
 - ci: bump actions/upload-artifact from 4 to 7 (#16)
 
-
-
-
 ## 1.8.2
 
 _2026-08-13_
 
-
-_2026-08-13_
-
 - alias: refuse shell keywords and builtins, which no shim can ever be (#44)
-
-
-
 
 ## 1.8.1
 
@@ -259,19 +169,10 @@ If you hit that crash, `brew upgrade oss` is enough.
 
 _2026-08-12_
 
-
-_2026-08-12_
-
 - Resolve relative symlinks against the link, not the working directory (#33)
 - Point at the runner from the place the question arises (#32)
 
-
-
-
 ## 1.7.0
-
-_2026-08-12_
-
 
 _2026-08-12_
 
@@ -287,13 +188,7 @@ _2026-08-12_
 - Move followup into the core, where it never needed a bench (#22)
 - Stop bumping the tap from the release workflow (#21)
 
-
-
-
 ## 1.6.1
-
-_2026-08-11_
-
 
 _2026-08-11_
 
@@ -303,13 +198,7 @@ _2026-08-11_
 - deps: bump com.diffplug.spotless:spotless-maven-plugin from 2.43.0 to 3.9.0 (#17)
 - Apache 2.0 headers on every source file, contributing rules, dependency alerts (#12)
 
-
-
-
 ## 1.6.0
-
-_2026-08-11_
-
 
 _2026-08-11_
 
@@ -319,26 +208,14 @@ _2026-08-11_
 - Serve: keep it running if asked, and read attached extensions' docs
 - Add an installation guide, and say where everything ends up
 
-
-
-
 ## 1.5.1
-
-_2026-08-11_
-
 
 _2026-08-11_
 
 - Detect a drifted manifest instead of silently acting on the snapshot
 - Correct two comments the approval redesign left stale
 
-
-
-
 ## 1.5.0
-
-_2026-08-11_
-
 
 _2026-08-11_
 
@@ -347,13 +224,7 @@ _2026-08-11_
 - Upstream writes: refused by default, approved by name, confirmed every time
 - Extensions: a bench that runs, a kb that remembers, gated when they write
 
-
-
-
 ## 1.4.1
-
-_2026-08-10_
-
 
 _2026-08-10_
 
@@ -361,13 +232,7 @@ _2026-08-10_
 - README: say where OSS-CLI sits, of the three
 - Publish the site from CI (#10)
 
-
-
-
 ## 1.4.0
-
-_2026-08-02_
-
 
 _2026-08-02_
 
@@ -382,9 +247,6 @@ _2026-08-02_
 - Keep generated notes out of the folders holding hand-written ones (#1)
 - Report what actually happened, index every repo, and close the loop
 - Remove a merge-conflict marker left in .gitignore
-
-
-
 
 ## 1.3.1
 
