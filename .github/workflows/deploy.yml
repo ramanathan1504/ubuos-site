@@ -103,6 +103,28 @@ jobs:
           cp .osscli/site/index.html site/dist/osscli/index.html
           echo "landing page folded in ($(wc -c < site/dist/osscli/index.html) bytes)"
 
+      # Hosts this project has retired. Linking to one is a dead link that answers
+      # nothing -- and it is easy to leave behind, because the page that links to it
+      # keeps building perfectly. ubuos.com's own catalogue pointed at
+      # osscli.pages.dev for hours after that project was deleted.
+      #
+      # Deterministic and offline: it does not ask whether a URL resolves, it asks
+      # whether we are still naming somewhere we chose to switch off.
+      - name: Refuse to publish links to retired hosts
+        run: |
+          set -euo pipefail
+          retired="osscli.pages.dev docs.ubuos.com ubuos-docs.pages.dev"
+          found=0
+          for host in $retired; do
+            if grep -rl --include='*.html' --include='*.json' --include='*.xml' "$host" site/dist >/dev/null 2>&1; then
+              echo "::error::the built site links to $host, which is retired"
+              grep -rl --include='*.html' "$host" site/dist | sed 's/^/    /'
+              found=1
+            fi
+          done
+          [ "$found" -eq 0 ] || exit 1
+          echo "no links to retired hosts"
+
       - name: Check something was actually produced
         working-directory: site
         # A build that succeeds and emits nothing would deploy an empty site over

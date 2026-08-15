@@ -4,7 +4,7 @@ tagline: "The context you already have, assembled before you need it."
 summary: "Reads any repository through the GitHub API — no clone, any language — and answers what a maintainer actually asks: is this pull request right, has this been decided before, what is waiting on me."
 install: "brew install ramanathan1504/oss-cli/oss"
 repo: "https://github.com/ramanathan1504/oss-cli"
-site: "https://osscli.pages.dev"
+site: "https://ubuos.com/osscli/"
 order: 10
 status: "stable"
 ---
