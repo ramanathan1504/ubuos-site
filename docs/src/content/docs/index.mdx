@@ -1,33 +1,58 @@
 ---
-title: ubuos
-description: Maintainer tooling — read any repository, run what needs running, remember what you worked out.
-template: splash
-hero:
-  tagline: The context you already have, assembled before you need it.
-  actions:
-    # Starlight does not apply `base` to these links, so they carry /docs/
-    # themselves. A bare /install/ here pointed at the catalogue site, which
-    # has no such page — the landing's only button was a 404.
-    - text: Install
-      link: /docs/install/
-      icon: right-arrow
-    - text: The commands
-      link: /docs/reference/commands/
-      icon: open-book
-      variant: minimal
+title: Start here
+description: What oss is, what it needs, and the shortest path to a first useful answer.
 ---
 
 import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 
-{/* LinkCards, not Cards: a landing page whose tiles cannot be clicked is a
-    dead end, and with `template: splash` there is no sidebar to fall back
-    on — these links are the only way into the manual from here. */}
+{/* Deliberately NOT `template: splash`.
 
-<CardGrid stagger>
+    A splash is a hero with two buttons and no sidebar, and putting one here
+    made "Docs" mean "another landing page" — you arrived at a tagline, chose
+    between Install and The commands, and only then reached documentation. Two
+    pages to read one. Worse, the splash hides the sidebar, so the reader could
+    not see that a manual existed at all.
+
+    Without it the sidebar is present on arrival: the whole manual is visible
+    the moment you land, and this page's job shrinks to saying where to begin. */}
+
+`oss` reads any repository through the GitHub API — no clone, any language — and
+answers the questions a maintainer actually asks: is this pull request right,
+has this been decided before, what is waiting on me.
+
+**A GitHub token is the whole requirement.** Every download carries its own Java.
+A local model and a notes folder each make it sharper, and neither is needed to
+start.
+
+## Two minutes to a first answer
+
+```bash
+brew install ramanathan1504/oss-cli/oss
+export GITHUB_TOKEN=$(gh auth token)
+
+oss sync --add apache/logging-log4j2   # register a project you follow
+oss sync --all                         # pull it down; builds the index as it goes
+
+oss critical                           # what arrived that matters most
+oss search "rollover compression"      # have I seen this before
+```
+
+After that first sync, **29 of the 36 commands never touch the network again** —
+including search by meaning, because the model doing the arithmetic runs inside
+the process rather than behind an API.
+
+## Where to go next
+
+<CardGrid>
+  <LinkCard
+    title="Install"
+    href="/docs/install/"
+    description="macOS, Linux, Windows — and what each one actually puts on your disk."
+  />
   <LinkCard
     title="What it is"
     href="/docs/what-it-is/"
-    description="A GitHub token is the whole requirement — every download carries its own runtime. Storing, filing and finding by keyword need no AI at all."
+    description="The whole requirement, and what every optional layer buys you."
   />
   <LinkCard
     title="How it fits together"
@@ -37,11 +62,26 @@ import { LinkCard, CardGrid } from '@astrojs/starlight/components';
   <LinkCard
     title="Connect your project"
     href="/docs/connect/"
-    description="A pack or an extension — settled in ten seconds, then the whole walkthrough of each."
+    description="A pack or an extension — settled in ten seconds, then the walkthrough of each."
+  />
+  <LinkCard
+    title="Finding things"
+    href="/docs/search/"
+    description="Search by meaning, offline, and why a result below 0.25 is not a result."
+  />
+  <LinkCard
+    title="What keeps running"
+    href="/docs/background/"
+    description="The services oss can leave running, how to see them, and how to stop them."
   />
   <LinkCard
     title="Every command"
     href="/docs/reference/commands/"
     description="Grouped by the question it answers, with what each one needs to run."
+  />
+  <LinkCard
+    title="Conversations"
+    href="/docs/conversations/"
+    description="Working an issue in dialogue, what gets remembered, and what went into each answer."
   />
 </CardGrid>

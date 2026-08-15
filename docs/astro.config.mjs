@@ -32,6 +32,11 @@ export default defineConfig({
       title: 'ubuos docs',
       description:
         'Maintainer tooling: read any repository, run what needs running, remember what you worked out.',
+      // Tokens only, lifted from the landing page. Following a "Docs" link used
+      // to change the palette out from under the reader -- Starlight's purple on
+      // grey against the site's teal and brass -- which reads as a different
+      // product, and for a manual that is the one impression you cannot afford.
+      customCss: ['./src/styles/ubuos.css'],
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/ramanathan1504/oss-cli' },
       ],
@@ -45,6 +50,33 @@ export default defineConfig({
           tag: 'script',
           content:
             "document.addEventListener('DOMContentLoaded',function(){for(var a of document.querySelectorAll('a[href^=\"http\"]')){if(a.hostname!==location.hostname){a.target='_blank';a.rel='noopener'}}});",
+        },
+        {
+          // The cable board, wherever a page puts one. It counts its own chips
+          // rather than being told a total, so a command added to the markup is
+          // counted without anyone remembering to update a number -- the same
+          // rule the CLI's own release tests enforce on its prose.
+          tag: 'script',
+          content: `document.addEventListener('DOMContentLoaded',function(){
+  var board=document.getElementById('cable'),btn=document.getElementById('cable-switch'),num=document.getElementById('cable-num');
+  if(!board||!btn||!num)return;
+  var all=board.querySelectorAll('.cmd').length,net=board.querySelectorAll('.cmd.net').length;
+  var calm=matchMedia('(prefers-reduced-motion: reduce)'),raf=0;
+  function countTo(t){cancelAnimationFrame(raf);var from=parseInt(num.textContent,10)||all;
+    if(calm.matches||from===t){num.textContent=String(t);return}
+    var s=performance.now();(function tick(now){var p=Math.min(1,(now-s)/420),e=1-Math.pow(1-p,3);
+      num.textContent=String(Math.round(from+(t-from)*e));if(p<1)raf=requestAnimationFrame(tick)})(s)}
+  function set(cut){board.classList.toggle('cut',cut);btn.setAttribute('aria-pressed',String(cut));
+    btn.querySelector('.cable-label').textContent=cut?'Plug it back in':'Pull the cable';
+    countTo(cut?all-net:all)}
+  btn.addEventListener('click',function(){set(btn.getAttribute('aria-pressed')!=='true')});
+  if(calm.matches)return;
+  var shown=false,io=new IntersectionObserver(function(es){es.forEach(function(e){
+    if(!e.isIntersecting||shown)return;shown=true;io.disconnect();
+    setTimeout(function(){if(btn.getAttribute('aria-pressed')==='true')return;set(true);
+      setTimeout(function(){if(btn.getAttribute('aria-pressed')==='true')set(false)},2400)},600)})},{threshold:.35});
+  io.observe(board);
+});`,
         },
       ],
       sidebar: [

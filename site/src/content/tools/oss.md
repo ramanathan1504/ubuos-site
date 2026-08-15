@@ -1,6 +1,6 @@
 ---
 name: "oss"
-tagline: "The context you already have, assembled before you need it."
+tagline: "Sync once. Then 29 of its 36 commands never touch the network again."
 summary: "Reads any repository through the GitHub API — no clone, any language — and answers what a maintainer actually asks: is this pull request right, has this been decided before, what is waiting on me."
 install: "brew install ramanathan1504/oss-cli/oss"
 repo: "https://github.com/ramanathan1504/oss-cli"

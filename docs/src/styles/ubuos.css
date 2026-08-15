@@ -1,0 +1,186 @@
+/* The manual, in the same colours as the rest of the site.
+ *
+ * Starlight ships a purple accent on a neutral grey. The landing pages are deep
+ * teal with brass, so following a "Docs" link changed the palette out from under
+ * the reader -- it read as a different product, which for a manual is the one
+ * impression you cannot afford.
+ *
+ * Only tokens are set here. Starlight builds every component from these, so
+ * restyling them rather than the components means an upgrade cannot quietly
+ * undo it, and nothing here has to know what a sidebar is made of.
+ *
+ * Values are lifted from oss-cli/site/index.html so the two cannot drift by
+ * eye: brass #D8B23A on dark, its darker #8A6A0F on light (contrast, not
+ * decoration), and the teal #5FBFB0 for links.
+ */
+
+:root {
+  /* Brass. Starlight wants a ramp; these are the same hue at three weights. */
+  --sl-color-accent-low: #3A2F0C;
+  --sl-color-accent: #A8891E;
+  --sl-color-accent-high: #E8C558;
+
+  --sl-color-white: #F2F8F8;
+  --sl-color-gray-1: #E6EFF0;
+  --sl-color-gray-2: #A9BEC5;
+  --sl-color-gray-3: #7B949C;
+  --sl-color-gray-4: #3F5D68;
+  --sl-color-gray-5: #1A3540;
+  --sl-color-gray-6: #122831;
+  --sl-color-black: #07141A;
+
+  /* The grounds the landing page uses, so a scroll between them is continuous. */
+  --sl-color-bg: #07141A;
+  --sl-color-bg-nav: #0D202A;
+  --sl-color-bg-sidebar: #0A1A22;
+  --sl-color-bg-inline-code: #0D202A;
+  --sl-color-hairline: #1A3540;
+  --sl-color-hairline-light: #122831;
+  --sl-color-hairline-shade: #0F2129;
+
+  --sl-color-text-accent: #68C0B4;
+  --sl-color-text-invert: #07141A;
+
+  --sl-color-backdrop-overlay: rgba(4, 14, 19, .82);
+}
+
+/* Light is the same palette with the roles swapped, not an inversion: brass goes
+   darker to hold contrast on paper, and the teal deepens with it. */
+:root[data-theme='light'] {
+  --sl-color-accent-low: #EDE2BE;
+  --sl-color-accent: #8A6A0F;
+  --sl-color-accent-high: #5C4708;
+
+  --sl-color-white: #08161D;
+  --sl-color-gray-1: #12242C;
+  --sl-color-gray-2: #3A525D;
+  --sl-color-gray-3: #536A74;
+  --sl-color-gray-4: #8AA0A8;
+  --sl-color-gray-5: #CBDADD;
+  --sl-color-gray-6: #DDE7E8;
+  --sl-color-gray-7: #EDF2F3;
+  --sl-color-black: #FFFFFF;
+
+  --sl-color-bg: #EDF2F3;
+  --sl-color-bg-nav: #F8FBFB;
+  --sl-color-bg-sidebar: #F3F7F8;
+  --sl-color-bg-inline-code: #E2EBEC;
+  --sl-color-hairline: #CBDADD;
+  --sl-color-hairline-light: #DDE7E8;
+  --sl-color-hairline-shade: #E2EBEC;
+
+  --sl-color-text-accent: #1B6259;
+  --sl-color-text-invert: #FFFFFF;
+}
+
+/* The site sets its headings in the system sans and its code in a mono stack
+   that prefers SF Mono; matching both keeps a command in the manual looking like
+   the same command on the landing page. */
+:root {
+  --sl-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --sl-font-mono: ui-monospace, 'SF Mono', SFMono-Regular, 'JetBrains Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
+}
+
+/* A tighter measure than Starlight's default. Long technical sentences are hard
+   enough without a 90-character line. */
+.sl-markdown-content {
+  --sl-content-width: 48rem;
+}
+
+/* Inline code reads as a thing you type, not as emphasis. */
+.sl-markdown-content code:not(pre code) {
+  border: 1px solid var(--sl-color-hairline-light);
+  border-radius: 4px;
+  padding: 0.08em 0.34em;
+  font-size: 0.88em;
+}
+
+/* ── the cable board ──────────────────────────────────────────────────────────
+ * The same graphic as the landing page, because the claim is the same one and a
+ * reader who saw it there should recognise it here. Built from the tokens above
+ * rather than copied hex, so the two stay in step through a palette change.
+ *
+ * Static-first: with no JS the board renders connected and every chip is
+ * legible. The switch is an enhancement, never the content.
+ */
+.cable { margin: 1.5rem 0 2rem; }
+.cable-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .9rem 1.4rem;
+  padding-bottom: .9rem; border-bottom: 1px solid var(--sl-color-hairline-light);
+  margin-bottom: 1.1rem;
+}
+.cable-switch {
+  display: inline-flex; align-items: center; gap: .65rem; cursor: pointer;
+  background: var(--sl-color-bg-nav); border: 1px solid var(--sl-color-hairline);
+  border-radius: 999px; padding: .4rem .95rem .4rem .45rem;
+  color: var(--sl-color-white); font: inherit; font-size: .88rem;
+  transition: border-color .25s ease;
+}
+.cable-switch:hover { border-color: var(--sl-color-accent-high); }
+.cable-switch:focus-visible { outline: 2px solid var(--sl-color-accent-high); outline-offset: 2px; }
+.cable-switch .knob {
+  width: 2.1rem; height: 1.15rem; border-radius: 999px; flex: none;
+  position: relative; background: var(--sl-color-gray-5); transition: background .3s ease;
+}
+.cable-switch .knob::after {
+  content: ""; position: absolute; top: .16rem; left: .16rem;
+  width: .83rem; height: .83rem; border-radius: 50%;
+  background: var(--sl-color-text-accent);
+  transition: transform .3s cubic-bezier(.22,1,.36,1), background .3s ease;
+}
+.cable-switch[aria-pressed="true"] .knob::after { transform: translateX(.95rem); background: #E08066; }
+.cable-read { display: flex; align-items: baseline; gap: .5rem; margin: 0; }
+.cable-num {
+  font-family: var(--sl-font-mono); font-size: 1.7rem; font-weight: 600;
+  color: var(--sl-color-text-accent); font-variant-numeric: tabular-nums;
+  line-height: 1; transition: color .3s ease;
+}
+.cable.cut .cable-num { color: var(--sl-color-accent-high); }
+.cable-of { font-size: .85rem; color: var(--sl-color-gray-3); }
+
+.cmd-board { list-style: none; display: flex; flex-wrap: wrap; gap: .45rem; padding: 0; margin: 0; }
+.cmd-board li { margin: 0; }
+.cmd {
+  font-family: var(--sl-font-mono); font-size: .78rem; padding: .24rem .6rem;
+  border: 1px solid var(--sl-color-hairline); border-radius: 6px;
+  color: var(--sl-color-gray-2); background: var(--sl-color-bg-nav);
+  transition: opacity .32s ease, color .32s ease, border-color .32s ease,
+              transform .32s cubic-bezier(.22,1,.36,1), filter .32s ease;
+}
+.cmd.net { border-color: var(--sl-color-accent-high); color: var(--sl-color-accent-high); }
+/* Staggered by index, so the cut reads as a wave crossing the board rather than
+   a single flat flicker. */
+.cable.cut .cmd.net {
+  opacity: .26; color: var(--sl-color-gray-3); border-color: var(--sl-color-hairline-light);
+  transform: translateY(3px); filter: saturate(0);
+  transition-delay: calc(var(--i) * 28ms);
+}
+.cable.cut .cmd:not(.net) {
+  border-color: var(--sl-color-text-accent); color: var(--sl-color-white);
+  transition-delay: calc(var(--i) * 9ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cmd, .cable-switch .knob, .cable-switch .knob::after, .cable-num { transition: none; }
+  .cable.cut .cmd { transition-delay: 0s; }
+  .cable.cut .cmd.net { transform: none; }
+}
+
+/* Asides. Starlight colours these from its own blue/purple/orange/red ramp,
+ * which the token overrides above do not touch -- so a Note kept rendering in
+ * indigo on a teal page, the one component still announcing a different product.
+ * Mapped onto the palette: teal for a note, brass for a caution, rust for danger.
+ */
+:root {
+  --sl-color-blue: #1B4F52;      --sl-color-blue-low: #0E2B2D;     --sl-color-blue-high: #8FD6CC;
+  --sl-color-purple: #1B4F52;    --sl-color-purple-low: #0E2B2D;   --sl-color-purple-high: #8FD6CC;
+  --sl-color-green: #1E5140;     --sl-color-green-low: #0F2B22;    --sl-color-green-high: #7FD3AE;
+  --sl-color-orange: #5C4708;    --sl-color-orange-low: #2E2404;   --sl-color-orange-high: #E8C558;
+  --sl-color-red: #5E2A1E;       --sl-color-red-low: #2F1510;      --sl-color-red-high: #E8A08C;
+}
+:root[data-theme='light'] {
+  --sl-color-blue: #8FD6CC;      --sl-color-blue-low: #DDF0EC;     --sl-color-blue-high: #14514A;
+  --sl-color-purple: #8FD6CC;    --sl-color-purple-low: #DDF0EC;   --sl-color-purple-high: #14514A;
+  --sl-color-green: #9AD9BC;     --sl-color-green-low: #E1F3EA;    --sl-color-green-high: #1B5C42;
+  --sl-color-orange: #E8C558;    --sl-color-orange-low: #F6EDD2;   --sl-color-orange-high: #5C4708;
+  --sl-color-red: #E8A08C;       --sl-color-red-low: #F8E4DE;      --sl-color-red-high: #7A2E1C;
+}
