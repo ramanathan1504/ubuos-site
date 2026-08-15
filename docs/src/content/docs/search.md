@@ -46,6 +46,28 @@ that never uses those words.
 once more afterwards — indexing is incremental and only fills what is missing.
 :::
 
+## Nothing on your subject is an answer
+
+Ranking by meaning always produces a ranking. Every nearest-neighbour search has
+a nearest neighbour, so a corpus holding nothing about your question still hands
+back its least-unrelated documents — and prints them in exactly the shape a real
+hit takes.
+
+Asked for `keyspace` against six notes, this used to answer with three:
+
+```
+0.10  ubuos-site grows a docs section
+0.09  oss 1.8.x — the corpus, complete backup, and the split shipped
+0.08  oss-cli 1.11.4 → 1.11.6: the gaps that only appeared when the tool was used
+```
+
+None of them is about a keyspace. They were the least unrelated files on disk.
+
+**Below 0.25, nothing is listed.** The search says it found nothing instead, and
+falls back to shared terms in case a literal match exists. Real subject matches
+land at 0.35 and above and are untouched — the same six notes answer *"documentation
+site deployment"* with two results at 0.46 and 0.39.
+
 ## A model server is not part of this
 
 Ollama is used for **verdicts, triage, `guide` and `chat`** — generating text.
