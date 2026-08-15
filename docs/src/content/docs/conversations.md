@@ -54,6 +54,40 @@ notes are charged against the same window. They used to be budgeted separately,
 which meant two limits that could each be satisfied and still overflow together.
 :::
 
+## Every answer says what went into it
+
+`review` has always closed with the layers it used. `chat` and `guide` do the
+same now — because without it, an answer built from your whole corpus and one
+built from the issue title alone print identically, and you are left guessing
+which you got.
+
+```
+── What went into this answer ──
+  ✔ The issue as filed              #4129 in apache/logging-log4j2
+  ✔ Your own prior work             22 passages (~5750 tokens) of 32 that matched
+        1 issue · 16 notes · 5 related issues
+  ✔ Answered by                     Gemini
+  ✗ Read back against your history  no local model — the API that wrote the
+                                    answer cannot also check it
+
+── What would make the next one better ──
+  · attach a local model that fits — then a cloud answer is checked against your own work
+```
+
+Three things in order: **what you already had**, **what the model added**, and
+**what would improve the next one**.
+
+`22 of 32` is the honest number — ten of your own passages did not fit the
+budget, and saying so is the whole point. Every absence carries its remedy;
+an absence without one is a complaint.
+
+:::note
+The alignment line is the one worth watching. A cloud answer read back against
+your own past work is a different object from one that was not, and only a
+**local** model can do that check — sending your history to the same API that
+wrote the answer would undo the reason the two steps are separate.
+:::
+
 ## Several terminals at once
 
 Each conversation is claimed by the terminal holding it. A second terminal that
