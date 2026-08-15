@@ -57,6 +57,7 @@ export default defineConfig({
             { label: 'Connect your project', slug: 'connect' },
             { label: 'Finding things', slug: 'search' },
             { label: 'Conversations', slug: 'conversations' },
+            { label: 'What keeps running', slug: 'background' },
           ],
         },
         {
