@@ -109,9 +109,27 @@ one signal it exists to show.
 
 ## With no connection
 
-Most of the list above never touches the network. The ones that do — `sync`,
-`review`, `pr`, `issue`, `followup`, `hub` — refuse in a sentence that names the
-cause and points at what still answers:
+Seven of the thirty-six reach the network. Flip the switch and watch which ones
+go quiet — the same board, and the same claim, as the front page.
+
+<div class="cable" id="cable">
+  <div class="cable-bar">
+    <button class="cable-switch" id="cable-switch" type="button" aria-pressed="false">
+      <span class="knob" aria-hidden="true"></span>
+      <span class="cable-label">Pull the cable</span>
+    </button>
+    <p class="cable-read"><span class="cable-num" id="cable-num">36</span> <span class="cable-of">of 36 commands still work</span></p>
+  </div>
+  <ul class="cmd-board"><li class="cmd net" style="--i:0">sync</li><li class="cmd net" style="--i:1">issue</li><li class="cmd net" style="--i:2">pr</li><li class="cmd net" style="--i:3">hub</li><li class="cmd net" style="--i:4">followup</li><li class="cmd net" style="--i:5">review</li><li class="cmd net" style="--i:6">model --fetch</li><li class="cmd" style="--i:7">search</li><li class="cmd" style="--i:8">prompt</li><li class="cmd" style="--i:9">inspect</li><li class="cmd" style="--i:10">history</li><li class="cmd" style="--i:11">chat</li><li class="cmd" style="--i:12">critical</li><li class="cmd" style="--i:13">duplicates</li><li class="cmd" style="--i:14">triage</li><li class="cmd" style="--i:15">guide</li><li class="cmd" style="--i:16">profile</li><li class="cmd" style="--i:17">onboard</li><li class="cmd" style="--i:18">report</li><li class="cmd" style="--i:19">trend</li><li class="cmd" style="--i:20">analyze</li><li class="cmd" style="--i:21">backlog</li><li class="cmd" style="--i:22">pick</li><li class="cmd" style="--i:23">hidden-critical</li><li class="cmd" style="--i:24">prs</li><li class="cmd" style="--i:25">serve</li><li class="cmd" style="--i:26">backup</li><li class="cmd" style="--i:27">restore</li><li class="cmd" style="--i:28">doctor</li><li class="cmd" style="--i:29">alias</li><li class="cmd" style="--i:30">ext</li><li class="cmd" style="--i:31">setup</li><li class="cmd" style="--i:32">run</li><li class="cmd" style="--i:33">memory</li><li class="cmd" style="--i:34">bench</li><li class="cmd" style="--i:35">kb</li></ul>
+</div>
+
+Six of the seven fetch one thing you asked for by number; `model --fetch`
+downloads the embedder once in the life of the install. Everything else reads a
+file on your disk — including search by meaning, because the model doing the
+arithmetic runs inside the process rather than behind an API.
+
+The ones that do need it refuse in a sentence naming the cause, and point at what
+still answers:
 
 ```
 $ oss issue 4143 --repo owner/name
