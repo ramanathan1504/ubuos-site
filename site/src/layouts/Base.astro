@@ -30,8 +30,13 @@ const { title, description } = Astro.props;
     <header class="bar">
       <a class="wordmark" href="/">ubuos</a>
       <nav>
-        <a href="/#review">How it works</a>
-        <a href="/#tools">Tools</a>
+        <!-- The root is the product page now, so these are its anchors. They used
+             to be /#review and /#tools, which belonged to a catalogue that no
+             longer exists -- a nav link to a section that was deleted still looks
+             perfectly fine in the source and lands the reader nowhere. -->
+        <a href="/#how">How it works</a>
+        <a href="/#offline">Offline</a>
+        <a href="/#install">Install</a>
         <a href="/extensions">Extensions</a>
         <a href="/docs/">Docs</a>
         <a href="https://github.com/ramanathan1504/oss-cli" class="ghost" target="_blank" rel="noopener">GitHub</a>

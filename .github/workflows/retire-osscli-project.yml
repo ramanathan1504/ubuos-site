@@ -1,6 +1,6 @@
 # Retire the osscli Pages project.
 #
-# The landing page moved to ubuos.com/osscli, folded into this site's build the
+# The landing page moved to ubuos.com, folded into this site's build the
 # way the manual was when docs.ubuos.com went. What is left behind is a second
 # Cloudflare project still serving a copy at osscli.pages.dev -- and a stale copy
 # that still answers is worse than none: search engines keep it, and the version
@@ -29,7 +29,7 @@ jobs:
       TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       PROJECT: osscli
-      REPLACEMENT: https://ubuos.com/osscli/
+      REPLACEMENT: https://ubuos.com/
     steps:
       - name: Check the confirmation matches
         run: |

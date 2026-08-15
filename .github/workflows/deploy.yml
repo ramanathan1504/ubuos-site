@@ -2,10 +2,15 @@
 #
 # One domain, three parts of one site:
 #
-#   site/          -> ubuos.com          the catalogue: what these tools are
-#   docs/          -> ubuos.com/docs     the manual
-#   oss-cli site/  -> ubuos.com/osscli   the product page, folded in from the
+#   oss-cli site/  -> ubuos.com          the product page, folded in from the
 #                                        other repository at build time
+#   docs/          -> ubuos.com/docs     the manual
+#   site/          -> ubuos.com/extensions  what plugs into it
+#
+# The root used to be a catalogue of tools, with the product page a level down at
+# /osscli/. The catalogue listed exactly one tool, so the site had two full
+# landing pages -- two headlines, two install lines -- and nothing to tell a
+# visitor which was the front door. One product, one front door; /osscli/ 301s.
 #
 # docs used to be its own host and the landing page used to be its own Pages
 # project. Both were folded in for the same reason: a second host is a second
@@ -93,15 +98,34 @@ jobs:
           ref: main
           path: .osscli
 
-      - name: Fold it into site/dist/osscli
+      # The ROOT, not /osscli/. There used to be a catalogue index here and the
+      # product page one level down -- two full landing pages, each with its own
+      # headline and install line, for a catalogue containing exactly one tool.
+      # A visitor could not tell which was the real front door. One product, one
+      # front door; /osscli/ redirects, so every link ever shared still lands.
+      - name: Fold the product page in as the site root
         run: |
           set -euo pipefail
-          mkdir -p site/dist/osscli
           # index.html only. _headers is honoured at the root of a Pages project
           # and nowhere else, so copying it into a subdirectory would look like a
           # policy that is silently not applied; README.md is source, not output.
-          cp .osscli/site/index.html site/dist/osscli/index.html
-          echo "landing page folded in ($(wc -c < site/dist/osscli/index.html) bytes)"
+          cp .osscli/site/index.html site/dist/index.html
+          echo "root landing page ($(wc -c < site/dist/index.html) bytes)"
+
+          # Nothing else may claim the root. If a page is ever added back at
+          # site/src/pages/index.astro, Astro writes it here and this copy would
+          # silently overwrite it -- or, with the steps reordered, be overwritten
+          # by it. Either way the site would have a front door nobody chose.
+          if [ -f site/src/pages/index.astro ]; then
+            echo "error: site/src/pages/index.astro exists and would fight the folded root." >&2
+            echo "       Decide which is the front door before shipping both." >&2
+            exit 1
+          fi
+
+          # The old URL keeps working. Cloudflare Pages reads _redirects from the
+          # output root; 301 because this is a decision, not an experiment.
+          printf '/osscli/*  /  301\n/osscli   /  301\n' >> site/dist/_redirects
+          echo "redirect written:"; cat site/dist/_redirects
 
       # Hosts this project has retired. Linking to one is a dead link that answers
       # nothing -- and it is easy to leave behind, because the page that links to it
@@ -132,7 +156,8 @@ jobs:
         run: |
           test -f dist/index.html      || { echo "no dist/index.html"; exit 1; }
           test -f dist/docs/index.html || { echo "docs missing from dist/docs"; exit 1; }
-          test -f dist/osscli/index.html || { echo "landing page missing from dist/osscli"; exit 1; }
+          grep -q 'cmd-board' dist/index.html || { echo "dist/index.html is not the product page"; exit 1; }
+          grep -q '^/osscli' dist/_redirects || { echo "no /osscli redirect: shared links would 404"; exit 1; }
           echo "$(find dist -name '*.html' | wc -l) page(s) built, docs included"
 
       - name: Create the Pages project if it does not exist
