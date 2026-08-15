@@ -32,7 +32,43 @@ copied, and your repository stays an ordinary repository.
 
 ### 1. Write `pack.sh`
 
-At the root of your repository. The whole thing:
+At the root of your repository. **Five declarations are all the engine insists
+on** — this is the whole of a pack that loads and lists:
+
+```bash
+PACK_NAME="orders"
+VERSIONS=(3.6.0 3.7.0 3.8.1)
+DEFAULT_VERSION=3.8.1
+APPS=(consumer)
+
+pack_module_path() {
+  case "$1" in
+    consumer) echo "apps/consumer" ;;
+    *)        return 1 ;;
+  esac
+}
+```
+
+That runs `oss run list` today. Everything below is added when you want the
+engine to *build and start* your applications rather than just enumerate them.
+
+| | Setting | Without it |
+|---|---|---|
+| **Required** | `PACK_NAME` `VERSIONS` `DEFAULT_VERSION` `APPS` | the engine refuses to load the pack |
+| **Required** | `pack_module_path()` | same — it cannot find your modules |
+| Defaulted | `PACK_APPS_DIR` `PACK_CONFIGS_DIR` | `apps` and `configs` |
+| Defaulted | `APPS_2X_ONLY` | empty — no application is excluded |
+| Only to build | `pack_build_flags()` | needed once you run anything that compiles |
+| Only to run | `pack_config_args()` `pack_main_class_for()` | needed once you start an application |
+| Optional | `pack_skip_reason()` | nothing is pruned; every cell is attempted |
+
+:::note
+The engine checks the five and stops if any is missing, deliberately: a pack
+that loads but declares nothing produces an empty matrix, and an empty matrix
+reports `0 cells, 0 failures` — which reads exactly like a pass.
+:::
+
+A fuller one, with the build and run hooks filled in:
 
 ```bash
 PACK_NAME="orders"
