@@ -124,4 +124,25 @@ A cause is only ever named when there is evidence for it. `hub` reports
 offline, and keeps saying `private, deleted, or no token` when it is not — because
 then that genuinely is the list.
 
+Two commands have a shape worth knowing:
+
+- **`setup` needs a terminal.** It asks eleven questions. Run without one — a
+  script, a pipe, CI — it refuses and changes nothing, rather than answering its
+  own questions with silence and reporting success.
+- **`backlog` passes its arguments through** to the report, flags included:
+  `oss backlog owner/name --no-ai --dry-run`.
+
 See [Finding things](/docs/search/) for what runs without a connection at all.
+
+## Pasting from these pages
+
+Every example here is written with its explanation on the same line:
+
+```bash
+oss followup                 # every recorded PR, one line each
+```
+
+zsh does not strip that — `interactive_comments` is off in an interactive shell,
+so `#` and everything after it arrive as arguments. `oss` discards them itself,
+so the line above runs as written whichever shell you paste it into. Only a bare
+`#` counts, so `oss pr #4240` still means 4240.
