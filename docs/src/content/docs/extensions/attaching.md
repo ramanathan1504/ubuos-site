@@ -3,6 +3,23 @@ title: Attaching one
 description: Attach a runner or a memory by path — nothing is uploaded or copied.
 ---
 
+:::note
+**You may not need one.** Both capabilities an extension can provide are already
+built in and work with nothing attached:
+
+| Capability | Works out of the box as | An extension |
+|---|---|---|
+| running things | the engine inside `oss`, driven by a [`pack.sh`](/docs/connect/) | replaces it with your own program |
+| remembering things | the built-in store — `file`, `search`, `index` | takes over, and is asked first |
+
+An extension never *enables* a capability. It substitutes a richer one, and when
+it does not declare a verb the built-in still answers, saying which store did.
+
+If what you have is "my project, and the versions I care about", you want a
+**pack** and not an extension — it is five declarations and no manifest. See
+[Connect your project](/docs/connect/).
+:::
+
 ```bash
 oss ext add ~/path/to/your-runner
 oss ext list
