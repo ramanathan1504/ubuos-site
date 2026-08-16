@@ -160,6 +160,52 @@ jobs:
           grep -q '^/osscli' dist/_redirects || { echo "no /osscli redirect: shared links would 404"; exit 1; }
           echo "$(find dist -name '*.html' | wc -l) page(s) built, docs included"
 
+      # Every download this site tells someone to run, actually fetched.
+      #
+      # The install page shipped `releases/latest/download/oss_1.7.1_amd64.deb`
+      # for thirteen releases. Both halves of that URL are reasonable and together
+      # they are dead: "latest" resolves to the newest release, and the newest
+      # release has no asset called 1.7.1. It rendered perfectly, read correctly,
+      # and 404'd for every Debian user who tried it. Nothing on the page could
+      # have caught it, because the page was never wrong -- the world moved.
+      #
+      # So the check is not "does it look right", it is "does it answer". A
+      # version number inside a `latest/download` URL is refused outright as well,
+      # because that one is dead the day after it is written and a green fetch
+      # today would only mean the release happened to still be current.
+      - name: Every download link must resolve
+        run: |
+          set -uo pipefail
+          # [:cntrl:] is load-bearing. Starlight puts a DEL (\x7f) between the
+          # lines of a code block for its copy button, so a class that excludes
+          # only whitespace runs the next command onto the end of the URL and
+          # every fetch 404s on a link that is actually fine.
+          urls=$(grep -rhoE 'https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/releases/[^[:space:][:cntrl:]"<>)]+' \
+                   site/dist --include='*.html' | sed 's/&amp;/\&/g' | sort -u)
+          [ -n "$urls" ] || { echo "no release links found -- did the fold run?"; exit 1; }
+          bad=0
+          while read -r u; do
+            [ -n "$u" ] || continue
+            case "$u" in
+              */latest/download/*[0-9].[0-9]*)
+                echo "::error::pinned version inside a latest/download URL: $u"
+                echo "  it resolves only while that release is newest. Use the version-free asset."
+                bad=1; continue ;;
+            esac
+            # -r 0-0 asks for the first byte, not the file. Without it this
+            # downloads a 163 MB archive per link, times out, and -- because a
+            # failed curl would append to what -w already printed -- reports the
+            # http_code "200000", which matches 2* and passes. A guard that goes
+            # green by concatenation is worse than no guard.
+            if ! code=$(curl -sS -o /dev/null -m 30 -w '%{http_code}' -L -r 0-0 "$u"); then
+              code=000
+            fi
+            printf '  %s  %s\n' "$code" "$u"
+            case "$code" in 200|206|30[0-9]) ;; *) echo "::error::dead link ($code): $u"; bad=1 ;; esac
+          done <<< "$urls"
+          [ "$bad" -eq 0 ] || exit 1
+          echo "every download link resolves"
+
       - name: Create the Pages project if it does not exist
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' }}
         # `pages deploy` fails outright on a project that does not exist, so the

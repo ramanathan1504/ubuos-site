@@ -1,0 +1,53 @@
+---
+/**
+ * The wordmark, and where it goes.
+ *
+ * Starlight points its site title at the docs root, which with `base: '/docs'`
+ * means clicking "ubuos" inside the manual takes you to the manual you are
+ * already reading. On a docs-only host that is right. Here it is not: the manual
+ * is one part of ubuos.com, and the wordmark is how you get out of it -- every
+ * other site in the world has taught people that clicking the name in the corner
+ * goes home, and going nowhere is the one response they do not expect.
+ *
+ * So the name goes to the site root, and "docs" beside it says where you
+ * currently are without pretending to be part of the name. Same two-part
+ * wordmark as the landing page's header, so crossing between them does not look
+ * like crossing between two products.
+ */
+---
+
+<a class="site-title" href="/" aria-label="ubuos home">
+  <span class="mark">ubuos</span><span class="where">docs</span>
+</a>
+
+<style>
+  .site-title {
+    display: flex;
+    align-items: baseline;
+    gap: 0.42rem;
+    text-decoration: none;
+    color: var(--sl-color-text-accent);
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    font-size: var(--sl-text-h4);
+    line-height: 1;
+  }
+  .site-title:hover .mark {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  /* Muted and lighter: it labels the section, it is not part of the name. */
+  .where {
+    color: var(--sl-color-gray-3);
+    font-weight: 400;
+    font-size: var(--sl-text-sm);
+    letter-spacing: 0;
+  }
+  /* Starlight puts the title in a narrow column on small screens; the label is
+     the half that can go without losing the way home. */
+  @media (max-width: 50rem) {
+    .where {
+      display: none;
+    }
+  }
+</style>

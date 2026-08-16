@@ -30,6 +30,17 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'ubuos docs',
+      // The wordmark leaves the manual. Starlight's own SiteTitle points at the
+      // docs root, so with base '/docs' clicking "ubuos" landed you on the page
+      // you were already reading -- the one thing nobody expects from the name in
+      // the corner. Overridden to go to the site root, and to carry the same
+      // two-part wordmark the landing page header has.
+      components: {
+        SiteTitle: './src/components/SiteTitle.astro',
+        // And the same links the landing header carries, so entering the manual
+        // does not drop every way back out of it.
+        SocialIcons: './src/components/SocialIcons.astro',
+      },
       description:
         'Maintainer tooling: read any repository, run what needs running, remember what you worked out.',
       // Tokens only, lifted from the landing page. Following a "Docs" link used
