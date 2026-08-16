@@ -1,0 +1,49 @@
+---
+/**
+ * The site's own links, in the manual's header.
+ *
+ * Crossing from ubuos.com into /docs used to drop every way back: the landing
+ * header carries Install, Extensions and the rest, and Starlight's carries a
+ * GitHub icon. So the manual read as a different site that happened to share a
+ * palette, and the only route back out was the browser's Back button.
+ *
+ * These are the same destinations as the landing header, in the same order.
+ * Starlight's own icons still render underneath -- imported rather than
+ * reimplemented, so a social link added in astro.config.mjs appears here without
+ * anyone remembering this file exists.
+ */
+import Default from '@astrojs/starlight/components/SocialIcons.astro';
+---
+
+<nav class="site-links" aria-label="ubuos">
+  <a href="/#how">How it works</a>
+  <a href="/#offline">Offline</a>
+  <a href="/#install">Install</a>
+  <a href="/extensions">Extensions</a>
+</nav>
+<Default {...Astro.props}><slot /></Default>
+
+<style>
+  .site-links {
+    display: flex;
+    gap: 1.1rem;
+    align-items: center;
+    font-size: var(--sl-text-sm);
+  }
+  .site-links a {
+    color: var(--sl-color-gray-2);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .site-links a:hover {
+    color: var(--sl-color-text-accent);
+  }
+  /* Starlight's header is tight once the search box is in it. Below that width
+     the sidebar is the navigation, and these would push the search field off
+     the end -- a worse loss than the links themselves. */
+  @media (max-width: 72rem) {
+    .site-links {
+      display: none;
+    }
+  }
+</style>

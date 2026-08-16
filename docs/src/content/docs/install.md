@@ -12,7 +12,7 @@ brew install ramanathan1504/oss-cli/oss
 ### Linux — Debian and Ubuntu
 
 ```bash
-curl -LO https://github.com/ramanathan1504/oss-cli/releases/latest/download/oss_1.7.1_amd64.deb
+curl -LO https://github.com/ramanathan1504/oss-cli/releases/latest/download/oss_amd64.deb
 sudo dpkg -i oss_*.deb
 ```
 
