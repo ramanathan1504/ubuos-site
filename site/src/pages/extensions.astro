@@ -11,7 +11,7 @@ const extensions = (await getCollection('extensions')).sort((a, b) => a.data.ord
 >
   <section>
     <p class="pill">Extensions</p>
-    <h1>Two extensions. Any number of packs.</h1>
+    <h1>One extension. Any number of packs.</h1>
     <p class="lede">
       An <strong>extension</strong> is a capability: one <em>runs</em> things, one
       <em>remembers</em> them. There is no SDK and no interface to implement — it is a
@@ -37,6 +37,36 @@ const extensions = (await getCollection('extensions')).sort((a, b) => a.data.ord
         </article>
       ))}
     </div>
+  </section>
+
+  <section class="tight">
+    <h2>Packs — nothing to attach</h2>
+    <p class="lede">
+      A pack is data. It has no program to call, so there is nothing to register: you name
+      the directory when you run it, or you stand in it.
+    </p>
+
+    <div class="grid">
+      <article class="card">
+        <h3>log4j2-workout <span class="pill">pack</span></h3>
+        <p>
+          Nineteen real applications wired to Apache Log4j, with 73 configurations and 7
+          versions to run them across — so “does this reproduce” has an answer rather than
+          an opinion. Its whole contract is one <code>pack.sh</code>.
+        </p>
+        <pre class="mini"><code>oss run --pack ~/apache/log4j2-workout \
+  matrix --scenario exceptions</code></pre>
+        <p class="more"><a href="https://github.com/ramanathan1504/log4j2-workout" target="_blank" rel="noopener">Source →</a></p>
+      </article>
+    </div>
+
+    <p class="lede" style="margin-top:16px">
+      This one used to be listed above, as a runner extension you attached. It stopped
+      being one when the matrix engine moved into <code>oss</code>: the engine is the
+      capability and ships with the tool, and what was left here is the playground it
+      walks. <code>oss ext add</code> on it now fails, correctly — there is no manifest,
+      because there is no program.
+    </p>
   </section>
 
   <section class="tight">
