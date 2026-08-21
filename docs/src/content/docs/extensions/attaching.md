@@ -9,8 +9,12 @@ built in and work with nothing attached:
 
 | Capability | Works out of the box as | An extension |
 |---|---|---|
-| running things | the engine inside `oss`, driven by a [`pack.sh`](/docs/connect/) | replaces it with your own program |
-| remembering things | the built-in store — `file`, `search`, `index` | takes over, and is asked first |
+| running things | `oss run detect / init / build / test / doctor` — your project's own build, read from the file that declares it — plus the matrix engine, driven by a [pack](/docs/connect/) | replaces it with your own program |
+| remembering things | `oss memory` — `file`, `search`, `index`, `map`, `coverage`, `gaps`, `harvest`, `digest`, `import`, `schedule`, `doctor` | takes over, and is asked first |
+
+A verb the extension does not declare falls back to the built-in rather than
+being refused, so attaching one costs you the richer form of a verb, never the
+verb itself.
 
 An extension never *enables* a capability. It substitutes a richer one, and when
 it does not declare a verb the built-in still answers, saying which store did.
