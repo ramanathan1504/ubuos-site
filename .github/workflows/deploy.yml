@@ -33,8 +33,19 @@ on:
   # Polled, because the landing page folded in below lives in another repository
   # and a push from there would need a cross-repo credential. Same trade as
   # sync-release.yml: a few hours of staleness against a secret that cannot lapse.
+  # Daily rather than every six hours. This poll exists because the landing page
+  # folded in below lives in another repository and a push from there would need
+  # a cross-repo credential -- the kind that expired once and shipped a stale
+  # formula in the tap without anyone noticing.
+  #
+  # oss-cli's release.sh now starts this workflow itself the moment it has
+  # tagged, from the shell of the person releasing, who is already authenticated.
+  # Nothing is stored here and nothing expires, and the site is current within a
+  # minute of a release rather than within six hours -- so this is the safety net
+  # for a release cut some other way, and a safety net does not need four runs a
+  # day to catch something that happens twice a week.
   schedule:
-    - cron: "41 */6 * * *"
+    - cron: "41 7 * * *"
   workflow_dispatch:
 
 concurrency:
