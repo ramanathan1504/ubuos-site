@@ -133,3 +133,32 @@ jobs:
               --title "docs: changelog for ${{ steps.rel.outputs.latest }}" \
               --body "Generated from the published releases of \`oss\` by the Sync release workflow. Release notes are written on the release, not here."
           fi
+
+          # And merge it. A generated file that waits for a human to press a button is a
+          # generated file that goes stale, and this one did: seven pull requests sat open
+          # while the published page said "Current release: 1.11.15" for twelve releases and
+          # five days. Every run reported success, because opening the pull request WAS the
+          # success -- which is this repository's own rule about a warning that scrolls past
+          # inside something that then prints success.
+          #
+          # Nothing is being bypassed. main is protected to require a pull request, and it
+          # requires zero approving reviews and no status checks, so the only thing between
+          # a correct generated file and the site was somebody noticing.
+          #
+          # --auto first so that the day a required check IS added, this waits for it instead
+          # of merging red. With nothing to wait for, GitHub rejects --auto as "clean status"
+          # rather than merging, which is what the fallback is for -- not error-swallowing,
+          # the two cases are genuinely different commands.
+          gh pr merge "$branch" --squash --delete-branch --auto \
+            || gh pr merge "$branch" --squash --delete-branch
+
+          # Deploy is NOT triggered by that merge, and this is the part that is easy to get
+          # wrong twice. A push made with GITHUB_TOKEN does not start another workflow, so
+          # deploy.yml's `on: push` will not see it -- the changelog would land on main and
+          # the published site would keep serving the old one, which is the same bug one
+          # layer down. Dispatching Deploy from here has the identical problem.
+          #
+          # So it is not attempted here. release.sh nudges Deploy from the releaser's own
+          # shell AFTER waiting for this merge to land, and the daily schedule is the safety
+          # net for a release cut some other way.
+          echo "merged; Deploy is started by release.sh once this is on main"
