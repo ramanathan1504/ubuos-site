@@ -49,13 +49,20 @@ That is the entire contract. **A repository only matters if you want to share
 it** — an extension is a folder, and a folder does not need a remote, a licence
 or a CI pipeline to work on your own machine.
 
-There are two kinds, because there are exactly two questions `oss` cannot answer
-from the GitHub API alone:
+There are two kinds, because there are exactly two questions the GitHub API
+cannot answer. **Both have a built-in floor** — an extension raises the ceiling,
+it is never the price of entry:
 
-| Kind | Answers | Why it cannot be built in |
-|---|---|---|
-| `runner` | *Does this actually run?* | Every project builds and runs differently. Nobody's CLI can execute your project for you |
-| `memory` | *Where should this be kept?* | `oss` has a memory of its own; an extension points it at the archive you already use instead |
+| Kind | Answers | Built in | An extension adds |
+|---|---|---|---|
+| `runner` | *Does this actually run?* | `oss run detect / init / build / test / doctor` — reads the file your project already declares its build in and runs the project's own commands | a repository that drives itself, and the version × config × app matrix a pack describes |
+| `memory` | *Where should this be kept?* | `oss memory` — markdown in a folder, indexed and searchable | the archive you already use, classified and linked |
+
+The line is not "can `oss` do this" but "can `oss` do this **for every project**".
+Reading a `pom.xml` or a `package.json` is the same work everywhere, so it lives
+in the core. Knowing that your service needs three containers and a seeded
+database is not, and no amount of detection invents it — that is what a pack, or
+a runner extension, is for.
 
 ## Where the line falls, with real examples
 
@@ -64,6 +71,8 @@ from the GitHub API alone:
 | Reading a pull request, an issue, follow-up, the hub | ✅ one API read, works anywhere | |
 | Search over your own backlog | ✅ term index built in, embeddings when a model is present | |
 | Filing and searching notes | ✅ markdown in a folder | Putting them in DEVONthink instead |
+| Building and testing the project in front of you | ✅ `oss run build`, `oss run test` — its own commands, printed before they run | |
+| Writing the pack that describes your matrix | ✅ `oss run init`, filled in from what is already in the directory | |
 | Running 19 applications across a version × config matrix | | ✅ 65 MB of real apps — that is a repository, not a command |
 
 Follow-up is the clearest case, because it used to be on the wrong side. It
