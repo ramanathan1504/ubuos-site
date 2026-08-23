@@ -16,13 +16,13 @@ import { LinkCard, CardGrid } from '@astrojs/starlight/components';
     Without it the sidebar is present on arrival: the whole manual is visible
     the moment you land, and this page's job shrinks to saying where to begin. */}
 
-`oss` reads any repository through the GitHub API — no clone, any language — and
-answers the questions a maintainer actually asks: is this pull request right,
-has this been decided before, what is waiting on me.
+`oss` is one command that answers from **what is already on your machine** — the
+repositories you follow, the notes you keep, the files in front of you — and
+only reaches for a model when it needs one.
 
 **A GitHub token is the whole requirement.** Every download carries its own Java.
-A local model and a notes folder each make it sharper, and neither is needed to
-start.
+A local model, a cloud key and a notes folder each make it sharper, and none of
+them is needed to start.
 
 ## Two minutes to a first answer
 
@@ -30,16 +30,42 @@ start.
 brew install ramanathan1504/oss-cli/oss
 export GITHUB_TOKEN=$(gh auth token)
 
-oss sync --add apache/logging-log4j2   # register a project you follow
-oss sync --all                         # pull it down; builds the index as it goes
+oss sync --add owner/name    # register a project you follow
+oss sync --all               # pull it down; builds the index as it goes
 
-oss critical                           # what arrived that matters most
-oss search "rollover compression"      # have I seen this before
+oss search "connection pool exhausted"   # have I seen this before
+oss ask "why does the retry loop give up after three attempts?"
 ```
 
-After that first sync, **29 of the 36 commands never touch the network again** —
-including search by meaning, because the model doing the arithmetic runs inside
-the process rather than behind an API.
+`owner/name` is a placeholder. Put your own repository there — a project you
+maintain, one you contribute to, or one you are trying to understand.
+
+## `ask` is the front door
+
+Everything else on this site is a specialised version of one question. `ask`
+reads your corpus, opens the files it needs, runs the project's own build when
+you allow it, and proposes edits as diffs you approve one at a time.
+
+```bash
+oss ask                              # keep asking; ctrl-d leaves
+oss ask "what changed in the rollover path this month?"
+oss ask --issue 4129 -r owner/name   # about one issue, with what is already known
+oss ask --allow-run "do the tests pass?"
+oss ask --allow-edit "fix the null check in the parser"
+```
+
+It answers from your own archive **before** it asks anything else — see
+[Skills](/docs/skills/) for the instructions it works from, and
+[Where an answer comes from](/docs/conversations/) for how it chooses a model.
+
+## What is actually there
+
+| | |
+|---|---|
+| **41 commands** | `oss --help` shows the 19 worth knowing; `oss --help-all` lists the other 22 |
+| **One that needs nothing** | after the first sync, your archive answers with the network unplugged |
+| **Six that go and get something** | `sync` `issue` `pr` `hub` `followup`, and `doctor` when it checks what is reachable |
+| **Five that name who answers** | `llm` `claude` `gemini` `codex` `junie` — a prefix in front of any command |
 
 ## Where to go next
 
@@ -53,6 +79,16 @@ the process rather than behind an API.
     title="What it is"
     href="/docs/what-it-is/"
     description="The whole requirement, and what every optional layer buys you."
+  />
+  <LinkCard
+    title="Where an answer comes from"
+    href="/docs/conversations/"
+    description="The ladder from your own corpus to a cloud key, and how to pick a rung."
+  />
+  <LinkCard
+    title="Skills"
+    href="/docs/skills/"
+    description="The instructions ask works from — four markdown files you can replace."
   />
   <LinkCard
     title="How it fits together"
@@ -70,18 +106,8 @@ the process rather than behind an API.
     description="Search by meaning, offline, and why a result below 0.25 is not a result."
   />
   <LinkCard
-    title="What keeps running"
-    href="/docs/background/"
-    description="The services oss can leave running, how to see them, and how to stop them."
-  />
-  <LinkCard
     title="Every command"
     href="/docs/reference/commands/"
-    description="Grouped by the question it answers, with what each one needs to run."
-  />
-  <LinkCard
-    title="Conversations"
-    href="/docs/conversations/"
-    description="Working an issue in dialogue, what gets remembered, and what went into each answer."
+    description="All 41, grouped by the question each one answers."
   />
 </CardGrid>
