@@ -144,6 +144,41 @@ verbs over; with none attached, the built-in one answers.
 | `ext` | Attach and inspect runners and memories |
 | `serve` | The same corpus as a page on `localhost:1504` |
 | `alias` | Give this command your own name |
+| `bug` | File a fault in oss itself, from the terminal |
+
+### Filing a fault in oss itself
+
+```bash
+oss bug "the board page is blank — only the extensions dropdown shows"
+oss bug --last      # report the last unexpected error, instead of describing one
+oss bug --print     # build the report and stop; post nothing
+```
+
+No browser, no account setup, no template. It exists because the distance
+between hitting a fault and a maintainer hearing about it was a browser, an
+account and about four minutes, and almost nobody pays that.
+
+**Nothing is posted that you have not read.** The whole issue body is printed
+first — not a summary of it — and only then are you asked. Answering no leaves
+nothing on the network.
+
+**What is taken out before you are shown it:** your home directory and the
+account name inside it; API keys in every shape GitHub, Google, OpenAI and
+Anthropic issue, including whatever an `Authorization` header carried; email
+addresses; and **the name of every repository you follow** — a stack trace from
+`oss hub` would otherwise publish the list of projects you work on, none of
+which is the bug. Each becomes `owner/name`.
+
+**No model is required.** If one is reachable it writes the title and a short
+summary; the stack, the build and the command are copied verbatim either way,
+because those are the parts a maintainer acts on. The confirmation says which of
+the two you got. **No token is required either** — without one the report is
+printed along with the address to paste it at.
+
+When a command dies of something unexpected, oss writes the crash down and
+offers this once. A pulled cable, a timeout and a rejected key are not offered:
+those are oss working correctly against a world that is not, and asking about
+them would teach you to say no to the question that mattered.
 
 ---
 
@@ -154,7 +189,9 @@ commands go and get something — `sync`, `issue`, `pr`, `hub`, `followup`, and
 `doctor` when it checks what is reachable. `review` asks whether the branch
 moved and answers from cache when it has not. `model --fetch` downloads once in
 the life of the install. The four cloud engines call their providers, and `llm`
-does not.
+does not. `bug` is the only one that *sends* anything, and only at the last
+step: without a network, or without a token, it prints the report and the
+address to paste it at instead.
 
 Everything else reads the SQLite database and the notes already on your disk,
 including search by meaning — the model doing that arithmetic runs inside the

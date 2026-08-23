@@ -13,6 +13,23 @@ environment variable and nothing remembered between runs — because each of tho
 becomes a thing switched on once and then forgotten, after which the protection
 exists only in the belief that it exists.
 
+## The one write oss makes on its own behalf
+
+`oss bug` files a fault **in oss itself**, to oss's own issue tracker. It never
+touches a repository you follow, and it is not a way to write to one.
+
+It obeys the rule above rather than escaping it. The entire issue body is
+printed first — redacted, and it is the bytes that will be sent, not a summary
+of them — and only then are you asked. Nothing is remembered between runs, so
+the next report asks again. Without a terminal to confirm at, it prints the
+report and stops; without a token, it prints the address to paste it at.
+
+The redaction is part of the rule, not a courtesy on top of it. A crash report
+is assembled from a command line, a stack trace and a working directory, and
+between them those carry your home path, whatever key was passed as an argument,
+and **the name of every repository you follow**. All of it comes out before you
+are shown anything.
+
 ## Two things, both required
 
 1. **You name the repository** — `--approve-upstream owner/name`. The name is
