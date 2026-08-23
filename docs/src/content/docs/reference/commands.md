@@ -9,9 +9,13 @@ description: What each command is for.
 
 | Command | Answers |
 |---|---|
+| `ask "<question>"` | Anything about the project you are standing in — it reads files, searches everything you have indexed, runs your own build, and can propose an edit you approve as a diff |
+| `ask` | With no question: a conversation. `--resume` picks the last one up |
+| `ask --issue <n>` | The same, about one issue, with everything already known about it |
+| `skill` | What `ask` has been told about how to work. Four ship built in; yours in `~/.oss-cli/skills` replace them by name |
 | `review <n>` | Is this pull request right, against what the project actually expects |
 | `search <words>` | Have I seen this before |
-| `chat <n>` | Work through one issue in conversation, saved as you go |
+| `chat <n>` | Work through one issue in conversation, saved as you go. Superseded by `ask --issue <n>`; still works |
 | `history` | Which conversations do I have, and where did each get to |
 | `inspect <n>` | What context sits behind one result |
 | `critical` | What arrived that matters most |

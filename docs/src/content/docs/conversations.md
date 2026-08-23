@@ -3,16 +3,30 @@ title: Conversations
 description: Starting a conversation about an issue, leaving it, and picking it up again.
 ---
 
-`oss chat` is a conversation about one issue that survives the terminal it was
-typed in. Every turn is written the moment it is said, so closing the window is
-a pause rather than a loss, and <kbd>ctrl-c</kbd> costs nothing.
+`oss ask` with no question opens a conversation about the project you are
+standing in. Every turn is written the moment it is said, so closing the window
+is a pause rather than a loss, and <kbd>ctrl-c</kbd> costs nothing.
 
 ```bash
-oss chat 4129          # start on an issue
+oss ask                       # a conversation, until you leave
+oss ask --resume              # pick the last one up
+oss ask --issue 4129          # about one issue, with everything known about it
+oss history                   # browse them all, and resume the one you choose
+```
+
+**Every question starts with what you already worked out** — your notes, your
+synced issues, and every question you have asked here with the answer it got. If
+one of them already solved it, you are pointed at it before anything new is
+proposed.
+
+`oss chat <n>` is the older, issue-only form of the same thing. It still works
+and takes the same flags; `ask --issue` covers it and is what `oss --help`
+shows.
+
+```bash
+oss chat 4129          # still works
 oss chat --continue    # carry on with the most recent
 oss chat --resume 7    # a specific one, by id
-oss chat --resume      # pick one from the list
-oss history            # browse them all, and resume the one you choose
 ```
 
 ## Finding the one you want
