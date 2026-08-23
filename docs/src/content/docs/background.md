@@ -30,6 +30,23 @@ oss serve --port 9000     # somewhere else
 stops when it closes. If `localhost:1504` is dead after you were using it, that
 is almost always the reason — `--install` is what makes it outlive the terminal.
 
+The first time you run it at a terminal it says so and offers, once:
+
+```
+  This stops when you close this terminal.
+  Keep it running — start at login, restart if it dies? [y/N] y
+  handing this port to the background service…
+  ✓ starts at login — launchd agent installed: …/com.osscli.serve.plist
+  ✓ http://localhost:1504/ is answering — you can close this terminal
+```
+
+Answering yes **hands the port over and gives you the terminal back**: the
+foreground server stops, the service takes 1504, and nothing is claimed until
+something is actually answering there. Answering no is remembered, so the
+question is asked once rather than once per start — `oss serve --install` is
+still there if you change your mind. Neither answer is offered when there is no
+terminal to answer at.
+
 ## Seeing what is running
 
 ```bash
