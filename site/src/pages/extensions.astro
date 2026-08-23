@@ -26,17 +26,36 @@ const extensions = (await getCollection('extensions')).sort((a, b) => a.data.ord
   </section>
 
   <section class="tight">
-    <h2>Available now</h2>
-    <div class="grid">
-      {extensions.map((e) => (
+    <h2>Published</h2>
+    {extensions.length > 0 ? (
+      <div class="grid">
+        {extensions.map((e) => (
+          <article class="card">
+            <h3>{e.data.name} <span class="pill">{e.data.kind}</span></h3>
+            <p>{e.data.summary}</p>
+            <pre class="mini"><code>{e.data.attach}</code></pre>
+            {e.data.repo && <p class="more"><a href={e.data.repo} target="_blank" rel="noopener">Source →</a></p>}
+          </article>
+        ))}
+      </div>
+    ) : (
+      <div class="grid">
         <article class="card">
-          <h3>{e.data.name} <span class="pill">{e.data.kind}</span></h3>
-          <p>{e.data.summary}</p>
-          <pre class="mini"><code>{e.data.attach}</code></pre>
-          {e.data.repo && <p class="more"><a href={e.data.repo} target="_blank" rel="noopener">Source →</a></p>}
+          <h3>None, and that is the point</h3>
+          <p>
+            The memory extension that used to sit here was folded into the tool.
+            <code>oss memory</code> files, indexes and searches your notes with nothing
+            attached, so there is no longer anything to install to get it.
+          </p>
+          <pre class="mini"><code>oss memory file notes.md
+oss memory search "connection pool"</code></pre>
+          <p class="more">
+            An extension is worth writing when <code>oss</code> genuinely cannot know
+            something — what is installed on your machine, and how your project runs.
+          </p>
         </article>
-      ))}
-    </div>
+      </div>
+    )}
   </section>
 
   <section class="tight">
@@ -48,24 +67,23 @@ const extensions = (await getCollection('extensions')).sort((a, b) => a.data.ord
 
     <div class="grid">
       <article class="card">
-        <h3>log4j2-workout <span class="pill">pack</span></h3>
+        <h3>Yours <span class="pill">pack</span></h3>
         <p>
-          Nineteen real applications wired to Apache Log4j, with 73 configurations and 7
-          versions to run them across — so “does this reproduce” has an answer rather than
-          an opinion. Its whole contract is one <code>pack.sh</code>.
+          A pack is a description of your applications, the versions you care about and
+          the configurations to run them under — so “does this reproduce” has an answer
+          rather than an opinion. Its whole contract is one <code>pack.sh</code>: four
+          declarations and a function that maps an application name to its directory.
         </p>
-        <pre class="mini"><code>oss run --pack ~/apache/log4j2-workout \
-  matrix --scenario exceptions</code></pre>
-        <p class="more"><a href="https://github.com/ramanathan1504/log4j2-workout" target="_blank" rel="noopener">Source →</a></p>
+        <pre class="mini"><code>oss run --pack ~/my-project \
+  matrix --scenario startup</code></pre>
+        <p class="more"><a href="https://ubuos.com/docs/connect/">How to write one →</a></p>
       </article>
     </div>
 
     <p class="lede" style="margin-top:16px">
-      This one used to be listed above, as a runner extension you attached. It stopped
-      being one when the matrix engine moved into <code>oss</code>: the engine is the
-      capability and ships with the tool, and what was left here is the playground it
-      walks. <code>oss ext add</code> on it now fails, correctly — there is no manifest,
-      because there is no program.
+      Packs are not published here and do not need to be. The matrix engine ships inside
+      <code>oss</code>; a pack is data it reads off your disk, so there is no manifest, no
+      program and nothing to register. <code>oss ext add</code> on a pack fails, correctly.
     </p>
   </section>
 

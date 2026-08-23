@@ -46,6 +46,19 @@ that never uses those words.
 once more afterwards — indexing is incremental and only fills what is missing.
 :::
 
+## `ask` searches the same corpus, through a different index
+
+`oss search` builds its term index from the database each time it runs, which
+costs nothing you notice on one query. `oss ask` may search several times inside
+a single answer, and rebuilding for each look does not scale — on a real archive
+of sixteen thousand issues it took **14.3 seconds a look**, which reads as a
+slow machine rather than as the wrong data structure.
+
+So the corpus is also kept in SQLite's own full-text index, written by `sync`
+and `memory index` rather than rebuilt per query. The same archive answers in
+**195 ms**. Nothing changes about what you type; the index is filled the first
+time a version that has it opens the store.
+
 ## Nothing on your subject is an answer
 
 Ranking by meaning always produces a ranking. Every nearest-neighbour search has
@@ -56,9 +69,9 @@ hit takes.
 Asked for `keyspace` against six notes, this used to answer with three:
 
 ```
-0.10  ubuos-site grows a docs section
-0.09  oss 1.8.x — the corpus, complete backup, and the split shipped
-0.08  oss-cli 1.11.4 → 1.11.6: the gaps that only appeared when the tool was used
+0.10  the site grows a docs section
+0.09  release notes — the corpus, complete backup, and the split shipped
+0.08  the gaps that only appeared once the tool was used
 ```
 
 None of them is about a keyspace. They were the least unrelated files on disk.
@@ -70,9 +83,10 @@ site deployment"* with two results at 0.46 and 0.39.
 
 ## A model server is not part of this
 
-Ollama is used for **verdicts, triage, `guide` and `chat`** — generating text.
+A model server is used for **answers, verdicts, triage and conversation** — generating text.
 It embeds nothing. `search`, `duplicates`, `pick` and `memory search` never call
-it, and no model server needs to be running for any of them.
+it, and no model server needs to be running for any of them. `ask` calls one
+only after it has read your own archive.
 
 ---
 

@@ -1,19 +1,58 @@
 ---
-title: Conversations
-description: Starting a conversation about an issue, leaving it, and picking it up again.
+title: Where an answer comes from
+description: Asking, choosing which rung answers, and reading what went into it.
 ---
 
-`oss chat` is a conversation about one issue that survives the terminal it was
-typed in. Every turn is written the moment it is said, so closing the window is
-a pause rather than a loss, and <kbd>ctrl-c</kbd> costs nothing.
+`oss ask` is a conversation that survives the terminal it was typed in. Every
+turn is written the moment it is said, so closing the window is a pause rather
+than a loss, and <kbd>ctrl-c</kbd> costs nothing.
 
 ```bash
-oss chat 4129          # start on an issue
-oss chat --continue    # carry on with the most recent
-oss chat --resume 7    # a specific one, by id
-oss chat --resume      # pick one from the list
-oss history            # browse them all, and resume the one you choose
+oss ask                              # keep asking; ctrl-d leaves
+oss ask "why is the retry loop giving up early?"
+oss ask --issue 4129 -r owner/name   # about one issue, with what is already known
+oss ask --resume                     # continue the last one in this directory
+oss history                          # browse them all, and resume the one you choose
 ```
+
+`ask` can look while it answers. It reads your corpus, opens files under the
+directory you started it in, and — only when you say so — runs the project's own
+build and proposes edits:
+
+| Flag | What it permits |
+|---|---|
+| `--allow-run` | the project's own build or test command. Never an arbitrary one |
+| `--allow-edit` | a change to one file, shown as a diff and confirmed by you before it is written |
+| `--steps <n>` | how many times it may look before it must answer |
+
+Neither permission is on unless you type it, and both are per-invocation: there
+is no setting that leaves them on.
+
+:::note
+`oss chat <n>` is still here and still works — `oss --help-all` lists it. It is
+`ask` narrowed to one issue and nothing else. Everything below about folding,
+sources and model fit applies to both.
+:::
+
+## Which rung answers
+
+With nothing in front of the command, `ask` takes the highest rung that is
+actually connected — your own corpus, then a local model server, then a signed-in
+provider CLI, then a cloud key. Name one to override it:
+
+```bash
+oss ask "…"              # whatever is connected, local first
+oss llm ask "…"          # the local model server, and nothing leaves the machine
+oss claude ask "…"       # Anthropic's API
+oss claude --cli ask "…" # the claude CLI you are already signed in to
+oss gemini ask "…"       # Google
+oss codex ask "…"        # OpenAI
+oss junie ask "…"        # JetBrains
+```
+
+With none of them connected it refuses, names **both** ways to fix it, and
+points at `oss prompt` — the same assembled context, as a prompt you can paste
+anywhere.
 
 ## Finding the one you want
 
@@ -23,7 +62,7 @@ resumes the highlighted one.
 
 Raw keyboard input needs a real terminal, which cron, CI, some remote shells and
 Windows do not provide. There the same list is numbered and picked by typing a
-number, and `oss chat --resume <id>` needs no list at all.
+number, and `oss ask --resume` needs no list at all.
 
 A `+` after the turn count means older turns have been folded into a summary, so
 the number is what is still verbatim rather than everything that was ever said.
@@ -56,14 +95,14 @@ which meant two limits that could each be satisfied and still overflow together.
 
 ## Every answer says what went into it
 
-`review` has always closed with the layers it used. `chat` and `guide` do the
-same now — because without it, an answer built from your whole corpus and one
+`review` has always closed with the layers it used. `ask` and `chat` do the
+same — because without it, an answer built from your whole corpus and one
 built from the issue title alone print identically, and you are left guessing
 which you got.
 
 ```
 ── What went into this answer ──
-  ✔ The issue as filed              #4129 in apache/logging-log4j2
+  ✔ The issue as filed              #4129 in owner/name
   ✔ Your own prior work             22 passages (~5750 tokens) of 32 that matched
         1 issue · 16 notes · 5 related issues
   ✔ Answered by                     Gemini
@@ -112,8 +151,8 @@ So the size is checked against what is actually free, before anything loads.
   of the desktop unusable is the same freeze from where you sit.
 - When it does not fit, the largest installed model that **would** is named.
   "Too big" is a complaint; "too big, use this one" is an instruction.
-- `chat` falls back to whatever else is connected. `guide` says which cloud flag
-  to pass instead.
+- `ask` falls back to whatever else is connected, and says which rung it moved
+  to rather than going quiet.
 
 ```
 ⚠ Not running 'qwen2.5-coder:7b' locally — it does not fit in memory right now.
@@ -146,7 +185,7 @@ prevent a freeze, and refusing on no evidence would be its own kind of broken.
 
 | Key | Meaning |
 |---|---|
-| `chat.context.chars` | The whole prompt budget — transcript and retrieved notes together. Default 32,000, roughly an 8k-token window |
+| `chat.context.chars` | The whole prompt budget, for `ask` and `chat` alike — transcript and retrieved notes together. Default 32,000, roughly an 8k-token window |
 | `ollama.timeout_seconds` | How long to wait for a local answer. Default 900 |
 | `ollama.model.guidance` | The model that answers. Pick one that fits — see above |
 

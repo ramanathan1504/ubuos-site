@@ -1,166 +1,161 @@
 ---
 title: Commands
-description: What each command is for.
+description: All 41, grouped by the question each one answers.
 ---
 
-`oss --help` lists everything; this is what each is *for*.
+There are **41 commands**. `oss --help` shows the 19 you will use; `oss --help-all`
+lists the other 22, which still work and always will — a command that stops being
+printed has not been removed, and removing one would force a major version.
 
-## Reading
+```bash
+oss --help          # the 19 worth knowing
+oss --help-all      # all 41, with the ones that have a shorter route marked
+```
+
+---
+
+## Start with one
 
 | Command | Answers |
 |---|---|
-| `review <n>` | Is this pull request right, against what the project actually expects |
+| `ask [question]` | Anything. Reads your corpus, opens files, and — when allowed — runs the build and proposes edits. No question starts a session you keep typing into |
+| `ask --issue <n> -r owner/name` | The same, about one issue, with everything already known about it in front of it |
 | `search <words>` | Have I seen this before |
-| `chat <n>` | Work through one issue in conversation, saved as you go |
-| `history` | Which conversations do I have, and where did each get to |
-| `inspect <n>` | What context sits behind one result |
+| `review <n>` | Is this pull request right, against what the project actually expects |
+| `hub` | Is anyone waiting on me, across every project I follow |
+
+Everything below is a specialised version of one of those.
+
+### What `ask` may do
+
+| Flag | Permits |
+|---|---|
+| `--allow-run` | this project's own build or test command. Never an arbitrary command |
+| `--allow-edit` | one file changed at a time, shown as a diff and confirmed before it is written |
+| `--steps <n>` | how many times it may look before it must answer |
+| `--resume` | continue the last ask in this directory |
+| `--model <name>` | which local model, when no engine was named |
+
+---
+
+## Who answers
+
+Five names, and each works **in front of any command**:
+
+```bash
+oss review 812              # the highest rung that is connected
+oss llm review 812          # the local model server. Nothing leaves the machine
+oss claude review 812       # Anthropic's API
+oss claude --cli review 812 # the claude CLI you are already signed in to
+oss gemini ask "…"          # Google
+oss codex ask "…"           # OpenAI
+oss junie ask "…"           # JetBrains
+```
+
+| Command | Reaches |
+|---|---|
+| `llm` | a local Ollama daemon |
+| `claude` | Anthropic — API key, or `--cli` for the signed-in CLI |
+| `gemini` | Google |
+| `codex` | OpenAI |
+| `junie` | JetBrains |
+
+Typed on their own they report what they can and cannot reach, rather than
+guessing. `oss claude doctor` is refused, because it would look like it asked a
+model something.
+
+See [Where an answer comes from](/docs/conversations/) for what happens when
+none of them is connected.
+
+---
+
+## Reading a project
+
+| Command | Answers | Network |
+|---|---|---|
+| `sync --add owner/name` | Follow a project | ✔ |
+| `sync --all` | Pull everything new, and index it as it goes | ✔ |
+| `issue <n>` | Read an issue as it was filed | ✔ |
+| `pr <n>` | Every mechanical fact about a pull request | ✔ |
+| `hub` | Every project you follow, in one list | ✔ |
+| `followup` | What moved on a reviewed pull request since you reviewed it | ✔ |
+| `profile` | A project's language, build and conventions | |
+| `onboard` | What a project expects before you contribute to it | |
+
+---
+
+## Finding things in what you have
+
+| Command | Answers |
+|---|---|
+| `search <words>` | Have I seen this before — by meaning with a model, by shared terms without one |
+| `duplicates` | Which of these are the same issue |
 | `critical` | What arrived that matters most |
-| `duplicates` | Is this the same as something already open |
-| `report` | What changed, and what is waiting on me |
-| `pr <n> --repo owner/name` | Every mechanical fact about a pull request |
-| `issue <n> --repo owner/name` | The report, as filed |
-| `followup` | What moved on a pull request since you reviewed it |
-| `hub` | Is anyone waiting on you — every project you follow, in one list |
-| `memory` | File, index and search your notes. Built in; an extension takes over |
-| `pick` | What to work on next, scored against what you have already reviewed and written |
+| `hidden-critical` | What matters that nobody has labelled |
 | `backlog` | The whole backlog as one page: clusters, mergeable, one fix away |
-| `run` | Run a pack — `oss run --pack <dir> matrix …`. The engine ships with `oss` |
-| `model` | The optional local model that upgrades search from words to meaning |
-| `backup` / `restore` | Everything that cannot be re-derived, into one zip — `--to` a synced folder for off-machine copies |
+| `pick` | What to work on next, scored against what you have already worked on |
+| `prs` | Cached open pull requests: stale, unreviewed, critical |
+| `inspect <n>` | Everything retrieved for an issue, and whether it will answer locally |
+| `prompt <n>` | The same context, as a prompt you can paste anywhere |
 
-## Extensions
+---
 
-| Command | Does |
+## Your own record
+
+| Command | Answers |
 |---|---|
-| `ext add <path>` | Attach a runner or a memory |
-| `ext list` | What is attached, and is it still reachable |
-| `ext refresh <name>` | Re-read a manifest after editing it |
-| `run <verb> …` | Dispatch to a runner |
-| `memory <verb> …` | Dispatch to a memory |
+| `memory file <path>` | Keep this |
+| `memory index` | Read what I keep into the corpus |
+| `memory search <words>` | Find it again |
+| `memory harvest` | Everything on GitHub you were involved in, as markdown |
+| `history` | Which conversations do I have, and where did each get to |
+| `chat <n>` | One issue in conversation. `ask --issue` is the shorter route |
+| `guide <n>` | A resolution blueprint. `ask --issue` is the shorter route |
+| `backup` | Export the whole archive, rotating the last five |
+| `restore` | Put one back |
 
-## When something goes wrong
+`memory` and `kb` are the same command. An attached memory extension takes the
+verbs over; with none attached, the built-in one answers.
 
-The console shows what you need while you work. The full record is on disk:
+---
 
-```
-~/.oss-cli/logs/oss-cli.log
-```
+## Running and reporting
 
-Everything the console printed, plus `DEBUG` — the calls that were made, the
-values that were read, the reason a step was skipped. When a command did
-something you did not expect, that file says why and the screen usually does
-not.
-
-| | |
+| Command | Answers |
 |---|---|
-| Level | `DEBUG` on disk, `INFO` on screen |
-| Rolls at | 10 MB, or daily |
-| Keeps | 10 files, gzipped |
+| `run --pack <dir> …` | Does it actually run, across your versions and configurations |
+| `triage <n>` | A consolidated audit of one issue |
+| `analyze` | Batch severity across the open backlog. Local model only — a metered API over a whole backlog spends money nobody agreed to |
+| `report` | A consolidated weekly health report |
+| `trend` | The same, week over week |
 
-`oss doctor` is the first thing to run; the log is the second.
+`run` and `bench` are the same command.
 
-:::note
-Writes to that file happen on a background thread, so logging never sits between
-you and an answer. It is flushed when the command exits, so the last line of a
-run is always there — including the last line of a run that failed.
+---
 
-The console is deliberately **not** written that way. In this program the
-console output *is* the interface, and an interface that arrives a moment late
-lands after the prompt you are already typing into.
-:::
+## The machine itself
 
-## Setup
-
-| Command | Does |
+| Command | Answers |
 |---|---|
-| `setup` | Models, tokens, note folders — every prompt skippable |
-| `doctor` | Every prerequisite at once, with the fix for each |
-| `alias <name>` | Give the command your own name |
-| `serve --install` | Keep the service running at login (macOS, Linux, Windows) |
-| `serve` | The local page on `:1504` |
-| `backup` / `restore` | Your database and palette |
+| `doctor` | What is missing, and exactly what to type to fix it |
+| `setup` | Configure models, paths and settings, interactively |
+| `model --fetch` | Put the 22 MB embedder on disk. Once, ever |
+| `skill` | What `ask` has been told about how to work |
+| `ext` | Attach and inspect runners and memories |
+| `serve` | The same corpus as a page on `localhost:1504` |
+| `alias` | Give this command your own name |
 
-:::note
-`doctor` exits non-zero when an **optional** prerequisite is missing. It is a
-report, not a failure.
-:::
+---
 
-## Following a review
+## What still works with the network unplugged
 
-`pr` is a snapshot: it says what something looks like now. It cannot say whether
-the author pushed after you commented — it has nothing to compare against.
+After the first `sync`, most of the list above never reaches out again. Six
+commands go and get something — `sync`, `issue`, `pr`, `hub`, `followup`, and
+`doctor` when it checks what is reachable. `review` asks whether the branch
+moved and answers from cache when it has not. `model --fetch` downloads once in
+the life of the install. The four cloud engines call their providers, and `llm`
+does not.
 
-```bash
-oss followup --record 4234 --repo owner/name --verdict blocked \
-             --note "compressionLevel=0 throws in the rollover"
-oss followup                 # every recorded PR, one line each
-oss followup --changed       # only the ones that moved
-```
-
-The record carries the repository, so one list covers every project you follow.
-It lives in `~/.oss-cli/reviews/`, outside any clone, because it outlives every
-checkout it describes.
-
-:::caution
-Recording is deliberately manual, and only correct after you have actually
-re-read the pull request at its new head. Doing it automatically would erase the
-one signal it exists to show.
-:::
-
-## With no connection
-
-Seven of the thirty-six reach the network. Flip the switch and watch which ones
-go quiet — the same board, and the same claim, as the front page.
-
-<div class="cable" id="cable">
-  <div class="cable-bar">
-    <button class="cable-switch" id="cable-switch" type="button" aria-pressed="false">
-      <span class="knob" aria-hidden="true"></span>
-      <span class="cable-label">Pull the cable</span>
-    </button>
-    <p class="cable-read"><span class="cable-num" id="cable-num">36</span> <span class="cable-of">of 36 commands still work</span></p>
-  </div>
-  <ul class="cmd-board"><li class="cmd net" style="--i:0">sync</li><li class="cmd net" style="--i:1">issue</li><li class="cmd net" style="--i:2">pr</li><li class="cmd net" style="--i:3">hub</li><li class="cmd net" style="--i:4">followup</li><li class="cmd net" style="--i:5">review</li><li class="cmd net" style="--i:6">model --fetch</li><li class="cmd" style="--i:7">search</li><li class="cmd" style="--i:8">prompt</li><li class="cmd" style="--i:9">inspect</li><li class="cmd" style="--i:10">history</li><li class="cmd" style="--i:11">chat</li><li class="cmd" style="--i:12">critical</li><li class="cmd" style="--i:13">duplicates</li><li class="cmd" style="--i:14">triage</li><li class="cmd" style="--i:15">guide</li><li class="cmd" style="--i:16">profile</li><li class="cmd" style="--i:17">onboard</li><li class="cmd" style="--i:18">report</li><li class="cmd" style="--i:19">trend</li><li class="cmd" style="--i:20">analyze</li><li class="cmd" style="--i:21">backlog</li><li class="cmd" style="--i:22">pick</li><li class="cmd" style="--i:23">hidden-critical</li><li class="cmd" style="--i:24">prs</li><li class="cmd" style="--i:25">serve</li><li class="cmd" style="--i:26">backup</li><li class="cmd" style="--i:27">restore</li><li class="cmd" style="--i:28">doctor</li><li class="cmd" style="--i:29">alias</li><li class="cmd" style="--i:30">ext</li><li class="cmd" style="--i:31">setup</li><li class="cmd" style="--i:32">run</li><li class="cmd" style="--i:33">memory</li><li class="cmd" style="--i:34">bench</li><li class="cmd" style="--i:35">kb</li></ul>
-</div>
-
-Six of the seven fetch one thing you asked for by number; `model --fetch`
-downloads the embedder once in the life of the install. Everything else reads a
-file on your disk — including search by meaning, because the model doing the
-arithmetic runs inside the process rather than behind an API.
-
-The ones that do need it refuse in a sentence naming the cause, and point at what
-still answers:
-
-```
-$ oss issue 4143 --repo owner/name
-error  no network — api.github.com could not be resolved.
-       Everything already synced still works offline: oss search, oss inspect, oss prompt.
-```
-
-A cause is only ever named when there is evidence for it. `hub` reports
-`17 unreachable (no network — GitHub was not reachable)` when the machine is
-offline, and keeps saying `private, deleted, or no token` when it is not — because
-then that genuinely is the list.
-
-Two commands have a shape worth knowing:
-
-- **`setup` needs a terminal.** It asks eleven questions. Run without one — a
-  script, a pipe, CI — it refuses and changes nothing, rather than answering its
-  own questions with silence and reporting success.
-- **`backlog` passes its arguments through** to the report, flags included:
-  `oss backlog owner/name --no-ai --dry-run`.
-
-See [Finding things](/docs/search/) for what runs without a connection at all.
-
-## Pasting from these pages
-
-Every example here is written with its explanation on the same line:
-
-```bash
-oss followup                 # every recorded PR, one line each
-```
-
-zsh does not strip that — `interactive_comments` is off in an interactive shell,
-so `#` and everything after it arrive as arguments. `oss` discards them itself,
-so the line above runs as written whichever shell you paste it into. Only a bare
-`#` counts, so `oss pr #4240` still means 4240.
+Everything else reads the SQLite database and the notes already on your disk,
+including search by meaning — the model doing that arithmetic runs inside the
+process rather than behind an API.

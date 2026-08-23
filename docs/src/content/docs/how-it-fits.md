@@ -10,16 +10,18 @@ There is one rule, and the rest of this page is it applied.
 
 ## What that means when you install it
 
-A fresh install has no extensions attached, and everything below already works:
+A fresh install has no extensions attached, no model and no key, and everything
+below already works:
 
 ```bash
-oss search "rollover compression"    # your own data, no model needed
+oss ask "how does this project handle retries?"   # your own data first
+oss search "connection pool exhausted"            # no model needed at all
 oss issue 4143 --repo owner/name
 oss pr 4240 --repo owner/name
 oss review 4240
-oss followup                         # what moved on what you reviewed
-oss hub                              # is anyone waiting on you
-oss memory file notes.md             # remember something
+oss followup                                      # what moved on what you reviewed
+oss hub                                           # is anyone waiting on you
+oss memory file notes.md                          # remember something
 oss memory search "keyspace"         # find it again
 ```
 
@@ -73,7 +75,7 @@ a runner extension, is for.
 | Filing and searching notes | ✅ markdown in a folder | Putting them in DEVONthink instead |
 | Building and testing the project in front of you | ✅ `oss run build`, `oss run test` — its own commands, printed before they run | |
 | Writing the pack that describes your matrix | ✅ `oss run init`, filled in from what is already in the directory | |
-| Running 19 applications across a version × config matrix | | ✅ 65 MB of real apps — that is a repository, not a command |
+| Running a dozen applications across a version × config matrix | | ✅ tens of megabytes of real apps — that is a repository, not a command |
 
 Follow-up is the clearest case, because it used to be on the wrong side. It
 lived inside a runner, where it worked against any repository but could only be
@@ -82,7 +84,7 @@ specific one. It needs one API read and a record; it forks no JVM. So it moved.
 
 ## A pack, worked through
 
-A real runner puts one project through nineteen applications, on real JVMs,
+A real runner puts one project through its applications, on real processes,
 across a version × configuration × application matrix. **You never need one to
 use `oss`** — the engine ships here, and a runner only supplies what to run.
 
@@ -94,7 +96,7 @@ What *is* specific lives in one file:
 BENCH_PACK=example ./bench list      # packs/example/ exists to be copied
 ```
 
-Point the same machinery at Kafka, Spark, or your own service by writing the
+Point the same machinery at your own service by writing the
 axes for it — the versions, the applications, the module map — and leaving the
 engine alone.
 
