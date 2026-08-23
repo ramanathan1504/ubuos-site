@@ -15,7 +15,7 @@ add a command of your own?**
 |---|---|---|
 | You have | applications, configurations, versions | a tool that already does something |
 | You want | `oss` to run them across a matrix | `oss` to call your tool |
-| You write | `pack.sh` — a description | `oss-ext.json` — a manifest |
+| You write | `pack.md` — a description | `oss-ext.json` — a manifest |
 | It contains | data. No program | an `exec` that runs |
 | You register it | **no — just point at it** | **yes — `oss ext add`** |
 | You type | `oss run --pack <dir> …` | `oss run --name <you> …` |
@@ -27,13 +27,61 @@ about", that is a pack, and it is the shorter of the two.
 
 ## Connect a pack
 
-A pack is a directory with a `pack.sh` in it. Nothing is registered, nothing is
+A pack is a directory with a `pack.md` in it. Nothing is registered, nothing is
 copied, and your repository stays an ordinary repository.
 
-### 1. Write `pack.sh`
+### 1. Let `oss` write it
 
-At the root of your repository. **Five declarations are all the engine insists
-on** — this is the whole of a pack that loads and lists:
+```bash
+cd ~/my-project
+oss run init
+```
+
+It reads what is already there — the build system, the repository from
+`.git/config`, the directories under `apps/` — and writes a `pack.md` with the
+rest marked as yours. It never overwrites one that exists.
+
+### 2. Fill in the three things it cannot know
+
+```json
+{
+  "name": "orders",
+  "useWhen": { "repository": "owner/name", "files": ["pom.xml"] },
+  "versions": ["3.6.0", "3.7.0", "3.8.1"],
+  "defaultVersion": "3.8.1",
+  "apps": ["consumer"],
+  "appsDir": "apps",
+  "configsDir": "configs",
+  "modulePath": "apps/{app}",
+  "mainClass": "com.example.{app}.Main"
+}
+```
+
+| | What it is | Why nothing can detect it |
+|---|---|---|
+| `versions` | the releases you want compared | they are the versions *you* care about, not the ones on disk |
+| `apps` | the applications that exercise the project | a directory is not evidence that it is worth running |
+| `mainClass` | **how to start one** | it is a decision, and a wrong one written confidently fails at launch looking like your project's fault |
+
+`{app}` is replaced with each application's name; `modulePathFor` and
+`mainClassFor` name the ones that differ.
+
+:::caution
+`mainClass` is the field to get right. Without it a pack lists its applications
+and can launch none of them — `oss run list` works, `oss run run` does not.
+`oss run run` says which field to add rather than letting the JVM report a class
+name it was never given.
+:::
+
+`pack.json` works identically. `pack.md` is the default because it lets a pack
+explain itself to a person on the same page it describes itself to the tool,
+which is what stops the two drifting apart.
+
+### The older shell form
+
+`pack.sh` still loads, and a pack that needs real logic — a skip rule that
+depends on three axes at once — is easier to write in it. **Five declarations
+are all the engine insists on:**
 
 ```bash
 PACK_NAME="orders"
@@ -59,13 +107,18 @@ engine to *build and start* your applications rather than just enumerate them.
 | Defaulted | `PACK_APPS_DIR` `PACK_CONFIGS_DIR` | `apps` and `configs` |
 | Defaulted | `APPS_2X_ONLY` | empty — no application is excluded |
 | Only to build | `pack_build_flags()` | needed once you run anything that compiles |
-| Only to run | `pack_config_args()` `pack_main_class_for()` | needed once you start an application |
+| Only to run | `pack_config_args()` | needed once an application takes a configuration |
+| **To run at all** | `pack_main_class_for()` | the application is listed and cannot be started |
 | Optional | `pack_skip_reason()` | nothing is pruned; every cell is attempted |
 
 :::note
 The engine checks the five and stops if any is missing, deliberately: a pack
 that loads but declares nothing produces an empty matrix, and an empty matrix
-reports `0 cells, 0 failures` — which reads exactly like a pass.
+reports `0 cells, 0 failures` — which reads exactly like a pass. Since 4.0 an
+empty sweep is an error rather than a clean run, for the same reason.
+
+Everything not in that list is genuinely optional: the engine defines a default
+for every hook before it reads your pack, and yours replaces it by existing.
 :::
 
 A fuller one, with the build and run hooks filled in:
@@ -132,11 +185,15 @@ never the exit code.
 
 ### A worked example you can copy
 
-`runner/packs/example/pack.sh` ships with `oss` — about thirty lines, and it
-runs. Copy the directory, change the five declarations, and the engine runs
-against your project instead. A production pack is not much larger: a real one
-covering nineteen applications across a version × configuration × application
-matrix declares it all in 88 lines.
+Two ship with `oss`: `runner/packs/example-json/pack.json` is the declarative
+form, and `runner/packs/example/pack.sh` is the shell one — about thirty lines
+each. Copy either, change the declarations, and the engine walks your project
+instead.
+
+A pack does not get much bigger with a real project behind it. One covering a
+dozen applications across a version × configuration × application matrix
+declares the whole thing in under a hundred lines, because the engine holds all
+the machinery and the pack holds only what is yours.
 
 Full field list: `runner/README.md` in
 [`oss`](https://github.com/ramanathan1504/oss-cli).
