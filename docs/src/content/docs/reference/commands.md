@@ -1,30 +1,53 @@
 ---
 title: Commands
-description: All 41, grouped by the question each one answers.
+description: Fifteen worth knowing, grouped by what you are trying to do, and twenty-seven more that still work.
 ---
 
-There are **41 commands**. `oss --help` shows the 19 you will use; `oss --help-all`
-lists the other 22, which still work and always will — a command that stops being
-printed has not been removed, and removing one would force a major version.
+There are **42 commands**. You need fifteen.
+
+`oss --help` shows those fifteen, grouped by the question each one answers, and
+that grouping is the same one below — the terminal and this page teach one shape
+on purpose, because a manual arranged differently from the tool is a second
+thing to learn.
 
 ```bash
-oss --help          # the 19 worth knowing
-oss --help-all      # all 41, with the ones that have a shorter route marked
+oss --help          # the fifteen, grouped
+oss --help-all      # all 42, marking which the short help does not show
 ```
+
+The other twenty-seven are not deprecated and are not going anywhere. A command
+that stops being *printed* has not been removed — removing one would force a
+major version, and would break somebody's script to tidy a screen they were not
+looking at.
+
+## The fifteen
+
+| | Commands | The question |
+|---|---|---|
+| **start with this** | `setup` `sync` | Get it configured, and get the data down |
+| **what is waiting on me** | `hub` | Is anyone blocked on me, across every project I follow |
+| **one pull request** | `review` `pr` `triage` | Is this right, and what is already known about it |
+| **find something** | `search` `ask` | Have I seen this before; answer this for me |
+| **run it for real** | `run` `serve` | Actually execute it; see it on a page |
+| **remember it** | `memory` | File, index and search my own notes |
+| **teach it** | `skill` `ext` | Give it a routine, or a capability it does not have |
+| **when something is wrong** | `doctor` `bug` | What is broken here; report a fault in oss |
+
+Any of them can be answered by a particular model by putting its name in front —
+`oss claude review 12` is still `review`. Those prefixes are `llm`, `claude`,
+`gemini`, `codex` and `junie`, and they are a choice about *who answers*, not
+commands of their own.
 
 ---
 
-## Start with one
+## The one to reach for first
 
-| Command | Answers |
-|---|---|
-| `ask [question]` | Anything. Reads your corpus, opens files, and — when allowed — runs the build and proposes edits. No question starts a session you keep typing into |
-| `ask --issue <n> -r owner/name` | The same, about one issue, with everything already known about it in front of it |
-| `search <words>` | Have I seen this before |
-| `review <n>` | Is this pull request right, against what the project actually expects |
-| `hub` | Is anyone waiting on me, across every project I follow |
+`ask` is the general case: it reads your corpus, opens files, and — when you allow it — runs the build and proposes edits. Everything else on this page is a specialised version of something `ask` would do more slowly.
 
-Everything below is a specialised version of one of those.
+```bash
+oss ask "why does the rollover skip a file"
+oss ask --issue 4226 -r owner/name
+```
 
 ### What `ask` may do
 
@@ -38,9 +61,9 @@ Everything below is a specialised version of one of those.
 
 ---
 
-## Who answers
+## Who answers, in full
 
-Five names, and each works **in front of any command**:
+Each of the five works **in front of any command**:
 
 ```bash
 oss review 812              # the highest rung that is connected
@@ -68,6 +91,17 @@ See [Where an answer comes from](/docs/conversations/) for what happens when
 none of them is connected.
 
 ---
+
+---
+
+# Everything, in detail
+
+The sections below include the twenty-seven commands `oss --help` does not
+print. They are listed because they work, not because you need them: each one is
+a shorter route to something in the fifteen above, kept because scripts and
+muscle memory use it.
+
+If you are learning this tool, stop at the table above.
 
 ## Reading a project
 
