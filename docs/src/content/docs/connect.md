@@ -77,11 +77,81 @@ name it was never given.
 explain itself to a person on the same page it describes itself to the tool,
 which is what stops the two drifting apart.
 
+### 3. The rules only you know
+
+Everything above describes what a pack *has*. What makes a real pack real is the
+rules — which cell cannot run and why, which JDK an application needs, how this
+project is told where its configuration is. The engine has eighteen hooks for
+those. Until oss 4.6 a pack file could express two of them, so needing a third
+meant writing `pack.sh` by hand and keeping it.
+
+Sixteen are fields now. Keys are **glob patterns**, and `*` is the default:
+
+```json
+{
+  "minJavaFor":        { "legacy-app": 8, "*": 17 },
+  "minVersionFor":     { "newer-app": "3.7.0" },
+  "requiresConfigFor": { "db": "appender-jdbc" },
+  "requiresAppFor":    { "*/appender-network": "web" },
+  "interactiveApps":   ["web"],
+
+  "skipWhen": [
+    { "version": "4.*", "appIn": "appsNewestMajorCannotBuild", "reason": "{app} has no 4.x release path" },
+    { "version": "4.*", "javaBelow": 17, "reason": "4.x requires Java 17+" }
+  ],
+
+  "buildFlags":     ["-Dlib.version={version}"],
+  "buildFlagsWhen": [ { "version": "4.*", "flags": ["-P4x"] } ],
+  "alwaysJvmArgs":  ["-Dscript.enable=groovy"],
+  "jvmArgsFor":     { "web": ["-Dselftest=true"] },
+
+  "configArgs": [
+    { "version": "4.*", "args": ["-Dconfiguration.location={config}"] },
+    { "args": ["-DconfigurationFile={config}"] }
+  ],
+  "configArgsAlso": [
+    { "app": "spring-*", "args": ["-Dlogging.config={config}"] }
+  ]
+}
+```
+
+`{app}`, `{config}`, `{version}` and `{java}` are replaced with the values the
+rule was asked about. A condition may be any of those as a glob, the same name
+with `Not` for the negative, or `javaBelow`.
+
+**`configArgs` is a chain and `buildFlagsWhen` is a list.** The first rule that
+matches `configArgs` wins and the rest are skipped, because those branches are
+alternatives — sending two spellings of "where the configuration is" means one
+of them is ignored, silently. `buildFlagsWhen` adds every rule that matches,
+because flags accumulate. `configArgsAlso` is the additive half of `configArgs`,
+applied on top of whichever branch won.
+
+:::caution
+A pattern is a glob, so `"4.*"` matches `4.0.1` and does **not** match `14.0`.
+An exact name matches exactly. If a rule seems not to fire, render the pack and
+look — `oss run list` loads it, and a rule that never matches is silent by
+design.
+:::
+
+### When it still has to be a program
+
+Two hooks are not data. `pack_modules` lists a project's modules out of a
+checkout and `pack_modules_on_classpath` filters a classpath on stdin — both are
+pipelines, and pretending otherwise would mean inventing a language for them.
+`shell` carries them verbatim:
+
+```json
+{
+  "shell": "pack_modules_on_classpath() { tr ':' '\\n' | grep -o 'com/example/[^/]*' | sort -u; }\n"
+}
+```
+
+Needing one costs a field rather than the whole file.
+
 ### The older shell form
 
-`pack.sh` still loads, and a pack that needs real logic — a skip rule that
-depends on three axes at once — is easier to write in it. **Five declarations
-are all the engine insists on:**
+`pack.sh` still loads, and nothing about it changed. **Five declarations are all
+the engine insists on:**
 
 ```bash
 PACK_NAME="orders"
