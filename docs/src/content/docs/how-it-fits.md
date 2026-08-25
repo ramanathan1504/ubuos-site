@@ -93,7 +93,7 @@ engine forks JVMs and walks a matrix; none of that knows what it is testing.
 What *is* specific lives in one file:
 
 ```bash
-BENCH_PACK=example ./bench list      # packs/example/ exists to be copied
+BENCH_PACK=example oss run list      # packs/example/ exists to be copied
 ```
 
 Point the same machinery at your own service by writing the

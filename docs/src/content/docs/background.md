@@ -9,8 +9,13 @@ asked for explicitly, and each stoppable with the command that installed it.
 | What | Where | Installed by |
 |---|---|---|
 | The local page | `localhost:1504` | `oss serve --install` |
-| A pack's own page | `localhost:8787` | `oss run <pack> hub --install` |
-| The archive harvest | no port, daily | your memory extension's own installer |
+| The daily harvest | no port, daily | `oss memory schedule --install` |
+
+There used to be a third: a pack could serve a page of its own, on its own port.
+The read-only half of it is in `oss` now and the half that could post upstream
+stayed with the pack that owned it, so nothing installs it and nothing serves
+it. The port it used is not written here on purpose -- a number a reader can
+still find is a number somebody tries.
 
 They use the platform's own service manager — **launchd** on macOS, **systemd
 --user** on Linux, **Task Scheduler** on Windows. Not a background thread, not a
@@ -94,8 +99,10 @@ oss serve --uninstall && oss serve --install
 ## Stopping all of it
 
 ```bash
-oss serve --uninstall
+oss serve --uninstall             # the page
+oss memory schedule --uninstall   # the daily harvest
 ```
 
-Removes the definition; nothing is left behind and no data is touched. A pack's
-page and an archive's harvest are removed the same way, by their own installers.
+Each removes its own definition; nothing is left behind and no data is touched.
+Neither reads the other's, so stopping one leaves the other running -- which is
+why both are written out here rather than described as "the same way".

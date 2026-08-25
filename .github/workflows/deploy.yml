@@ -160,6 +160,33 @@ jobs:
           [ "$found" -eq 0 ] || exit 1
           echo "no links to retired hosts"
 
+      # The retired-hosts check above is about where a link POINTS. This is about what
+      # the prose CLAIMS, which nothing was checking: oss-cli's own AdvertisedPortTest
+      # guards its landing page and every .md at its root, and says in as many words
+      # that it cannot fail a build over another repository. This is that repository.
+      #
+      # So "A pack's own page | localhost:8787 | oss run <pack> hub --install" sat in the
+      # table telling readers what listens on their machine, for two releases after the
+      # port was retired and the command started answering "moved". Found by hand, which
+      # is the part worth fixing.
+      - name: Refuse to publish a retired port or a command that moved
+        run: |
+          set -euo pipefail
+          bad=0
+          # The changelog quotes history on purpose: an entry describing the release that
+          # removed a thing has to be able to name it.
+          pages=$(find site/dist -name '*.html' -not -path '*/changelog/*')
+          for term in '8787' 'oss run hub' './bench' '--log4j '; do
+            hits=$(grep -rl -- "$term" $pages 2>/dev/null || true)
+            if [ -n "$hits" ]; then
+              echo "::error::the built site still says '$term', which no longer exists"
+              echo "$hits" | sed 's/^/    /'
+              bad=1
+            fi
+          done
+          [ "$bad" -eq 0 ] || exit 1
+          echo "no retired port, and no command that answers \"moved\""
+
       - name: Check something was actually produced
         working-directory: site
         # A build that succeeds and emits nothing would deploy an empty site over
