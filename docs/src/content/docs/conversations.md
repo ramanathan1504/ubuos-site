@@ -15,6 +15,37 @@ oss ask --resume                     # continue the last one in this directory
 oss history                          # browse them all, and resume the one you choose
 ```
 
+## At the prompt
+
+The line you type is a real one: arrow keys, <kbd>ctrl-a</kbd> and
+<kbd>ctrl-e</kbd>, and <kbd>↑</kbd> for what you asked last time — history is
+kept across sessions, because a question worth asking again is usually worth
+asking about a different repository. <kbd>Tab</kbd> completes a command name,
+and offers the choices when more than one matches.
+
+<kbd>ctrl-d</kbd> and <kbd>ctrl-c</kbd> both leave. Neither is an error and
+neither loses anything: every turn was written when it was said.
+
+Where there is no terminal — under `cron`, in CI, or with input piped in — the
+editing quietly stops being offered and the prompt still reads a line.
+
+## Nothing waits in silence
+
+Anything that takes more than a moment says what it is doing, how long it has
+been, and — when a model is answering — how much of the answer has arrived:
+
+```
+⠹ asking claude — 18420 characters — claude is answering, 10 KB so far   3.1s
+```
+
+A command that shows nothing cannot be told from one that has hung. This is the
+difference between waiting and wondering, and it is why `oss claude review` on a
+large pull request no longer looks broken while it thinks.
+
+Set `NO_COLOR` to turn the colour off. It is off automatically when the output
+is not a terminal, so `oss review 4129 > review.md` gives you a file to read
+rather than one full of escape codes.
+
 `ask` can look while it answers. It reads your corpus, opens files under the
 directory you started it in, and — only when you say so — runs the project's own
 build and proposes edits:
