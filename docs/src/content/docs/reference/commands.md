@@ -142,6 +142,9 @@ If you are learning this tool, stop at the table above.
 | `memory index` | Read what I keep into the corpus |
 | `memory search <words>` | Find it again |
 | `memory harvest` | Everything on GitHub you were involved in, as markdown |
+| `memory sessions` | The CLI transcripts already on your disk, filed under what each was about |
+| `memory contributions <checkout>` | One note per change of yours that merged, with its whole review |
+| `memory curriculum` | What a subject documents, against what you have covered |
 | `history` | Which conversations do I have, and where did each get to |
 | `chat <n>` | One issue in conversation. `ask --issue` is the shorter route |
 | `guide <n>` | A resolution blueprint. `ask --issue` is the shorter route |
@@ -150,6 +153,30 @@ If you are learning this tool, stop at the table above.
 
 `memory` and `kb` are the same command. An attached memory extension takes the
 verbs over; with none attached, the built-in one answers.
+
+`memory sessions` reads the transcripts Claude Code, codex and gemini already
+keep, and files each under its subject rather than under the program that wrote
+it — the tool is a field on the note, never a folder. A session that names a pull
+request or an issue appends a dated section to that subject's note instead of
+starting a new one, so four days on one issue is one note and not five files.
+`kb.json` can name more folders to read and projects to leave out.
+
+`memory contributions` takes a checkout and writes one note per change of yours
+that reached a release branch: the commit, the branch, the diffstat, the files,
+the description, the timeline, and every remark anybody made — including the ones
+pinned to lines of the diff, which is where review actually happens. Read-only:
+every git command is a read and every GitHub call a GET.
+
+`memory curriculum` places every area a subject's own manual documents into one
+of three states. **gap** — the archive says nothing about it. **backlog** — you
+have met it, in a note or a change that merged, and never sat down with it; the
+note lists where. **covered** — you read it and said so. Nothing ever assigns
+that last one: you move the file, and re-running never moves it back.
+
+Filing needs no model. `--enrich` adds a paragraph saying what a session settled,
+from whichever CLI or local model is on the machine, and the note records which
+wrote it. `memory schedule --install --hourly` files transcripts as you work and
+prints the hook for doing it the moment a session ends.
 
 ---
 
