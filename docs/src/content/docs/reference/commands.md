@@ -173,6 +173,13 @@ have met it, in a note or a change that merged, and never sat down with it; the
 note lists where. **covered** — you read it and said so. Nothing ever assigns
 that last one: you move the file, and re-running never moves it back.
 
+`memory coverage` is the other half and deliberately uses a different word.
+It counts what your notes say about each area and reports them as **touched**,
+never *covered* — for a while both commands said "covered" and meant opposite
+things, so one reported a subject as "32 of 56 covered" while the other reported
+"0 covered", both correct, about different questions. Writing about something
+forty times is having met it; only you can say you have learned it.
+
 Filing needs no model. `--enrich` adds a paragraph saying what a session settled,
 from whichever CLI or local model is on the machine, and the note records which
 wrote it. `memory schedule --install --hourly` files transcripts as you work and
